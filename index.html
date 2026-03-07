@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EQ Resources — Financial Model</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #c8a96e; --gold-dim: #92651a; --blue: #60a5fa; --green: #34d399;
+    --red: #f87171; --purple: #a78bfa; --bg: #070d14; --bg2: #050b10;
+    --bg3: #0a0f16; --bg4: #0f1923; --border: #1a2332;
+    --text: #e5e7eb; --text-dim: #9ca3af; --text-muted: #6b7280;
+    --mono: 'IBM Plex Mono', monospace; --sans: 'Barlow', sans-serif;
+  }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:14px; min-height:100vh; }
+  header { background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+  .logo { display:flex; align-items:center; gap:12px; }
+  .logo-bar { width:6px; height:32px; background:linear-gradient(180deg,var(--gold),var(--gold-dim)); border-radius:2px; }
+  .logo-text { font-size:17px; font-weight:700; color:#f3f4f6; letter-spacing:-0.01em; }
+  .logo-sub { font-size:10px; color:var(--text-muted); font-family:var(--mono); letter-spacing:0.1em; margin-top:1px; }
+  .reset-btn { padding:7px 16px; background:var(--bg4); border:1px solid #374151; border-radius:6px; color:var(--text-dim); font-size:11px; cursor:pointer; font-family:var(--mono); letter-spacing:0.06em; transition:all .2s; }
+  .reset-btn:hover { background:#1f2937; color:var(--text); border-color:var(--gold); }
+  .layout { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 65px); }
+  .left-panel { background:var(--bg2); border-right:1px solid var(--border); padding:20px 22px; overflow-y:auto; height:calc(100vh - 65px); position:sticky; top:65px; }
+  .right-panel { padding:20px 28px; overflow-y:auto; }
+  .section { margin-bottom:24px; }
+  .section-title { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:10px; text-transform:uppercase; letter-spacing:0.12em; font-weight:600; }
+  .section-title::before { content:''; display:block; width:16px; height:2px; background:currentColor; flex-shrink:0; }
+  .slider-row { margin-bottom:15px; }
+  .slider-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+  .slider-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+  .slider-value { font-family:var(--mono); font-size:14px; font-weight:700; }
+  .slider-sub { font-size:9px; color:#4b5563; margin-bottom:4px; }
+  .track { position:relative; height:5px; background:var(--bg4); border-radius:3px; }
+  .track-fill { position:absolute; left:0; top:0; height:100%; border-radius:3px; pointer-events:none; }
+  .track-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:13px; height:13px; border-radius:50%; border:2px solid var(--bg); pointer-events:none; box-shadow:0 0 8px currentColor; }
+  input[type=range] { position:absolute; top:-6px; left:0; width:100%; height:18px; opacity:0; cursor:pointer; margin:0; }
+  .slim { display:flex; justify-content:space-between; font-size:9px; color:#374151; margin-top:2px; }
+  .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+  .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+  .kpi { padding:12px 14px; background:var(--bg3); border:1px solid transparent; border-radius:8px; position:relative; overflow:hidden; }
+  .kpi::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--kpi-color,var(--gold)); }
+  .kpi-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
+  .kpi-val { font-family:var(--mono); font-weight:700; color:var(--kpi-color,var(--gold)); line-height:1; }
+  .kpi-val.big { font-size:20px; } .kpi-val.med { font-size:16px; }
+  .kpi-sub { font-size:9px; color:var(--text-muted); margin-top:4px; }
+  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; }
+  .card-title { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-family:var(--mono); }
+  .irow { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
+  .irow.bold { border-top:1px solid var(--border); margin-top:2px; padding-top:6px; }
+  .irow.ind .il { padding-left:14px; }
+  .il { font-size:11px; color:var(--text-muted); }
+  .irow.bold .il { color:#d1d5db; font-weight:600; font-size:12px; }
+  .iv { font-family:var(--mono); font-size:11px; }
+  .irow.bold .iv { font-size:13px; font-weight:700; }
+  .mrow { margin-bottom:12px; }
+  .mhdr { display:flex; justify-content:space-between; margin-bottom:4px; }
+  .mname { font-size:11px; color:var(--text-dim); }
+  .mpct { font-family:var(--mono); font-size:12px; font-weight:700; }
+  .btrack { height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+  .bfill { height:100%; border-radius:3px; transition:width .3s; }
+  .stbl { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:11px; }
+  .stbl th { padding:5px 8px; color:var(--text-muted); text-align:center; border-bottom:1px solid var(--border); font-weight:400; }
+  .stbl th:first-child { text-align:left; }
+  .stbl td { padding:4px 8px; text-align:center; }
+  .stbl td:first-child { text-align:left; color:var(--text-dim); }
+  .stbl tr:nth-child(even) td { background:#080e15; }
+  .brow { display:flex; justify-content:space-between; padding:5px 0; }
+  .brow.bold { border-top:1px solid var(--border); padding-top:8px; margin-top:2px; }
+  .bl { font-size:11px; color:var(--text-muted); }
+  .brow.bold .bl { color:#d1d5db; font-weight:600; font-size:12px; }
+  .bv { font-family:var(--mono); font-size:12px; }
+  .brow.bold .bv { font-size:13px; font-weight:700; }
+  .disclaimer { font-size:9px; color:#374151; margin-top:14px; line-height:1.7; }
+  @media(max-width:900px){.layout{grid-template-columns:1fr;}.left-panel{position:static;height:auto;}.g4{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-bar"></div>
+    <div>
+      <div class="logo-text">EQ Resources</div>
+      <div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+</header>
+
+<div class="layout">
+  <div class="left-panel">
+    <div class="section">
+      <div class="section-title" style="color:var(--gold)">Tungsten-hinta</div>
+      <div id="sl-price"></div>
+    </div>
+    <div class="section">
+      <div class="section-title" style="color:var(--blue)">Tuotanto</div>
+      <div id="sl-prod"></div>
+    </div>
+    <div class="section">
+      <div class="section-title" style="color:var(--red)">Kustannukset</div>
+      <div id="sl-cost"></div>
+    </div>
+    <div class="section">
+      <div class="section-title" style="color:var(--green)">Rahoitus & Arvostus</div>
+      <div id="sl-fin"></div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+
+    <!-- STOCK PRICE PANEL -->
+    <div style="display:flex;align-items:stretch;gap:0;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex-wrap:wrap;">
+      <!-- input -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:170px;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">ASX: EQR — Kurssi (A$)</div>
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">A$</span>
+          <input id="sp-input" type="number" value="0.345" step="0.005" min="0.001" oninput="onSP()"
+            style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);background:transparent;border:none;border-bottom:1px solid #374151;width:90px;outline:none;padding:2px 0;">
+        </div>
+        <div style="font-size:9px;color:#4b5563;margin-top:3px;">Päivitä itse</div>
+      </div>
+      <!-- mkt cap -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Markkina-arvo</div>
+        <div id="sp-mktcap" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);"></div>
+        <div id="sp-mktcap-usd" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
+      </div>
+      <!-- ev upside -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EV/EBITDA upside</div>
+        <div id="sp-ev" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div>
+        <div id="sp-ev-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
+      </div>
+      <!-- pe upside -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">P/E upside</div>
+        <div id="sp-pe" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div>
+        <div id="sp-pe-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
+      </div>
+      <!-- avg upside -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Avg. tavoite</div>
+        <div id="sp-avg" style="font-family:var(--mono);font-size:22px;font-weight:700;"></div>
+        <div id="sp-avg-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
+      </div>
+      <!-- 52wk bar -->
+      <div style="padding:14px 18px;flex:2;min-width:180px;display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">52vk &nbsp;<span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span></div>
+        <div style="position:relative;height:6px;background:var(--bg4);border-radius:3px;">
+          <div id="sp-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#374151,var(--gold));border-radius:3px;"></div>
+          <div id="sp-bar-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);box-shadow:0 0 6px var(--gold);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#4b5563;margin-top:3px;"><span>A$0.028</span><span>A$0.390</span></div>
+      </div>
+    </div>
+
+    <div class="g3" id="kpi-top"></div>
+    <div class="g4" id="kpi-bot"></div>
+
+    <div class="card">
+      <div class="card-title">▸ Tuloslaskelma (M USD)</div>
+      <div id="income"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Marginaalit & Spredit</div>
+      <div id="margins"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Herkkyysanalyysi — EPS (USD) &nbsp;<span style="color:#4b5563;font-size:9px;">APT-hinta vs. WO3 kokonaistuotanto</span></div>
+      <div style="overflow-x:auto;" id="senswrap"></div>
+      <div style="font-size:9px;color:#4b5563;margin-top:8px;">* Korostettu solu = nykyiset parametrit &nbsp;|&nbsp; Vihreä = parempi kuin base &nbsp;|&nbsp; Punainen = alle 50% base-EPS</div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Arvostussilta (A$/osake)</div>
+      <div id="bridge"></div>
+    </div>
+    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. EQR:n tulos riippuu tuotantoluvuista, rahoitusrakenteesta, hedge-sopimuksista ja lainanhoitokuluista. Käytä omaa harkintaa.</div>
+  </div>
+</div>
+
+<script>
+// ── DEFAULTS ──────────────────────────────────────────────────────────────
+const DEFAULTS = {
+  aptPrice:             1500,  // APT CIF Rotterdam maaliskuu 2026 ~$2160, käyttäjä voi säätää
+  concRealisation:        75,  // % APT-pariteettiin (EQR myy pääosin concentraattia)
+  mtCarbine:            1400,  // t WO3/a — nyt ~1200, johdon tavoite ~1750 (2026)
+  barruecopardo:        1600,  // t WO3/a — Espanja, kapasiteetti ~1600
+  recoveryRate:           78,  // % — APT-pilottilaitoksella tavoite 95%
+  c1Cost:                155,  // USD/mtu
+  aisc:                  220,  // USD/mtu all-in sustaining
+  corpOverhead:           12,  // M USD/a — kaksi kaivosta
+  da:                     15,  // M USD/a
+  sharesOut:            4800,  // milj. osaketta (~4.79 mrd, maaliskuu 2026)
+  netDebt:                45,  // M USD
+  evMultiple:            8.0,
+  peMultiple:           10.0,
+  audUsd:              0.635,
+};
+
+let V = {...DEFAULTS};
+let SP = 0.345; // A$ osakekurssi
+
+// ── SLIDER DEFINITIONS ────────────────────────────────────────────────────
+const SLIDERS = {
+  price: [
+    { key:'aptPrice',         label:'APT spot-hinta',              min:200,  max:5000, step:25,    unit:'USD/mtu',  sub:'CIF Rotterdam — maaliskuu 2026: ~$2 160/mtu', color:'var(--gold)' },
+    { key:'concRealisation',  label:'Concentraatti-realisaatio',   min:40,   max:95,   step:1,     unit:'%',        sub:'% APT-pariteettiin — EQR myy concentraattia', color:'#a78540' },
+  ],
+  prod: [
+    { key:'mtCarbine',        label:'Mt Carbine (Australia)',      min:200,  max:4000, step:50,    unit:'t WO3/a',  sub:'Nyt ~1 200 t/a → johdon tavoite ~1 750 t (2026)', color:'var(--blue)' },
+    { key:'barruecopardo',    label:'Barruecopardo (Espanja)',      min:500,  max:3500, step:50,    unit:'t WO3/a',  sub:'Saloro — kapasiteetti ~1 600 t/a, Traxys-offtake', color:'#38bdf8' },
+    { key:'recoveryRate',     label:'Recovery rate',               min:50,   max:98,   step:1,     unit:'%',        sub:'Nykyinen ~78% → APT-pilottilaitoksella 95%',    color:'#3b82f6' },
+  ],
+  cost: [
+    { key:'c1Cost',           label:'C1 cash cost',                min:80,   max:500,  step:5,     unit:'USD/mtu',  sub:'Suorat tuotantokulut USD/mtu',                  color:'var(--red)' },
+    { key:'aisc',             label:'AISC',                        min:120,  max:600,  step:5,     unit:'USD/mtu',  sub:'All-in sustaining cost USD/mtu',                color:'#ef4444' },
+    { key:'corpOverhead',     label:'Yleiskulut',                  min:5,    max:40,   step:0.5,   unit:'M USD',    sub:'Corporate overhead — kaksi kaivosta',           color:'#dc2626' },
+    { key:'da',               label:'D&A poistot',                 min:5,    max:50,   step:0.5,   unit:'M USD',    sub:'Depreciation & amortisation M USD/a',           color:'#b91c1c' },
+  ],
+  fin: [
+    { key:'sharesOut',        label:'Osakkeet liikkeessä',         min:1000, max:7000, step:50,    unit:'milj.',    sub:'Nykyinen ~4 800M (maaliskuu 2026)',              color:'var(--green)' },
+    { key:'netDebt',          label:'Netto velka',                 min:0,    max:200,  step:2,     unit:'M USD',    sub:'Velka − kassa M USD',                          color:'#10b981' },
+    { key:'evMultiple',       label:'EV/EBITDA-kerroin',           min:3,    max:20,   step:0.5,   unit:'x',        sub:'Vertaisarvostuskerroin',                         color:'#059669' },
+    { key:'peMultiple',       label:'P/E-kerroin',                 min:5,    max:40,   step:0.5,   unit:'x',        sub:'Osakekurssitavoitteen P/E-pohja',               color:'#047857' },
+    { key:'audUsd',           label:'AUD/USD',                     min:0.50, max:0.80, step:0.005, unit:'kurssi',   sub:'Valuuttakurssi',                                 color:'#6ee7b7' },
+  ],
+};
+
+// ── FORMATTERS ────────────────────────────────────────────────────────────
+const fi = (n, d=1) => isNaN(n)||!isFinite(n) ? '–' : n.toLocaleString('fi-FI', {minimumFractionDigits:d, maximumFractionDigits:d});
+const fM  = (n, d=1) => '$' + fi(n, d) + 'M';
+const fU  = (n, d=1) => '$' + fi(n, d);
+const fA  = (n, d=3) => 'A$' + fi(n, d);
+
+function fmtSV(val, unit) {
+  if (unit==='USD/mtu') return '$' + Math.round(val);
+  if (unit==='%')       return val + '%';
+  if (unit==='x')       return val + 'x';
+  if (unit==='kurssi')  return 'A$' + val;
+  if (unit==='M USD')   return '$' + val + 'M';
+  return fi(val,0) + ' ' + unit;
+}
+
+// ── CALCULATE ─────────────────────────────────────────────────────────────
+function calc(p) {
+  const totalWO3    = p.mtCarbine + p.barruecopardo;
+  const realPrice   = p.aptPrice * (p.concRealisation / 100);
+  const grossRev    = (realPrice * totalWO3 * 100 / 1e6) * (p.recoveryRate / 100);
+  const aiscTotal   = p.aisc * totalWO3 * 100 / 1e6;
+  const grossProfit = grossRev - aiscTotal;
+  const ebitda      = grossProfit - p.corpOverhead;
+  const ebit        = ebitda - p.da;
+  const tax         = ebit > 0 ? ebit * 0.30 : 0;
+  const ni          = ebit - tax;
+  const eps         = ni / p.sharesOut;          // USD per share
+  const epsAUD      = eps / p.audUsd;
+  const ebitdaMargin= grossRev > 0 ? ebitda / grossRev * 100 : 0;
+  const netMargin   = grossRev > 0 ? ni / grossRev * 100 : 0;
+  const cashMargin  = grossRev > 0 ? grossProfit / grossRev * 100 : 0;
+  const spread      = p.aptPrice - p.aisc;
+
+  // Valuation
+  const ev       = ebitda * p.evMultiple;
+  const equity   = ev - p.netDebt;
+  const navUSD   = equity / p.sharesOut;
+  const navAUD   = navUSD / p.audUsd;
+  const peAUD    = Math.max(eps, 0) * p.peMultiple / p.audUsd;
+  const avgAUD   = (navAUD + peAUD) / 2;
+
+  return { totalWO3, grossRev, aiscTotal, grossProfit, ebitda, ebit, tax, ni,
+           eps, epsAUD, ebitdaMargin, netMargin, cashMargin, spread,
+           ev, equity, navUSD, navAUD, peAUD, avgAUD };
+}
+
+// ── SLIDER BUILD ──────────────────────────────────────────────────────────
+function buildSliders(group, containerId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  SLIDERS[group].forEach(cfg => {
+    const pct = ((V[cfg.key] - cfg.min) / (cfg.max - cfg.min)) * 100;
+    const row = document.createElement('div');
+    row.className = 'slider-row';
+    row.innerHTML = `
+      <div class="slider-header">
+        <span class="slider-label">${cfg.label}</span>
+        <span class="slider-value" id="sv-${cfg.key}" style="color:${cfg.color}">${fmtSV(V[cfg.key], cfg.unit)}</span>
+      </div>
+      <div class="slider-sub">${cfg.sub}</div>
+      <div class="track" id="tr-${cfg.key}">
+        <div class="track-fill" id="tf-${cfg.key}" style="width:${pct}%;background:linear-gradient(90deg,${cfg.color}55,${cfg.color})"></div>
+        <div class="track-thumb" id="tt-${cfg.key}" style="left:${pct}%;color:${cfg.color};background:${cfg.color}"></div>
+        <input type="range" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${V[cfg.key]}"
+          oninput="onSlider('${cfg.key}','${cfg.unit}',${cfg.min},${cfg.max},this.value)">
+      </div>
+      <div class="slim"><span>${fmtSV(cfg.min,cfg.unit)}</span><span>${fmtSV(cfg.max,cfg.unit)}</span></div>`;
+    el.appendChild(row);
+  });
+}
+
+function onSlider(key, unit, min, max, raw) {
+  const val = parseFloat(raw);
+  V[key] = val;
+  const pct = ((val - min) / (max - min)) * 100;
+  document.getElementById('sv-'+key).textContent = fmtSV(val, unit);
+  document.getElementById('tf-'+key).style.width = pct + '%';
+  document.getElementById('tt-'+key).style.left  = pct + '%';
+  render();
+}
+
+// ── KPI HELPER ────────────────────────────────────────────────────────────
+function kpi(label, val, sub, color, big) {
+  return `<div class="kpi" style="--kpi-color:${color}">
+    <div class="kpi-label">${label}</div>
+    <div class="kpi-val ${big?'big':'med'}">${val}</div>
+    <div class="kpi-sub">${sub}</div>
+  </div>`;
+}
+
+// ── STOCK PANEL ───────────────────────────────────────────────────────────
+function renderStockPanel(r) {
+  const sp  = SP;
+  const mcAUD = sp * V.sharesOut;      // M AUD
+  const mcUSD = mcAUD * V.audUsd;
+
+  const col = v => v >= 0 ? 'var(--green)' : 'var(--red)';
+  const pct = v => (v >= 0 ? '+' : '') + fi(v,1) + '%';
+
+  const uEV  = r.navAUD > 0 && sp > 0 ? (r.navAUD  - sp) / sp * 100 : 0;
+  const uPE  = r.peAUD  > 0 && sp > 0 ? (r.peAUD   - sp) / sp * 100 : 0;
+  const uAvg = r.avgAUD > 0 && sp > 0 ? (r.avgAUD  - sp) / sp * 100 : 0;
+
+  document.getElementById('sp-mktcap').textContent     = 'A$' + fi(mcAUD,0) + 'M';
+  document.getElementById('sp-mktcap-usd').textContent = '≈ US$' + fi(mcUSD,0) + 'M';
+
+  document.getElementById('sp-ev').textContent  = pct(uEV);
+  document.getElementById('sp-ev').style.color  = col(uEV);
+  document.getElementById('sp-ev-tgt').textContent = 'Tavoite ' + fA(r.navAUD);
+
+  document.getElementById('sp-pe').textContent  = pct(uPE);
+  document.getElementById('sp-pe').style.color  = col(uPE);
+  document.getElementById('sp-pe-tgt').textContent = 'Tavoite ' + fA(r.peAUD);
+
+  document.getElementById('sp-avg').textContent  = pct(uAvg);
+  document.getElementById('sp-avg').style.color  = col(uAvg);
+  document.getElementById('sp-avg-tgt').textContent = 'Tavoite ' + fA(r.avgAUD);
+
+  const wkLow=0.028, wkHigh=0.390;
+  const wPct = Math.max(0, Math.min(100, (sp-wkLow)/(wkHigh-wkLow)*100));
+  document.getElementById('sp-bar-fill').style.width = wPct + '%';
+  document.getElementById('sp-bar-dot').style.left   = wPct + '%';
+}
+
+function onSP() {
+  const val = parseFloat(document.getElementById('sp-input').value);
+  if (!isNaN(val) && val > 0) { SP = val; render(); }
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────
+function render() {
+  const r   = calc(V);
+  const pos = v => v > 0 ? 'var(--green)' : 'var(--red)';
+
+  const total = V.mtCarbine + V.barruecopardo;
+  const scLabel = total < 2500 ? '⚠ Alle johdon ohjauksen (3–4 kt)' :
+                  total < 3000 ? '📍 Johdon ohjauksen alaraja' :
+                  total < 4000 ? '✅ Johdon ohjausalue 3–4 kt' :
+                  total < 5500 ? '🚀 Tuplausskenaario' : '🔭 Bulliskenaario';
+
+  // KPI TOP ROW
+  document.getElementById('kpi-top').innerHTML =
+    kpi('Liikevaihto', fM(r.grossRev), 'M USD / vuosi', 'var(--gold)', true) +
+    kpi('EBITDA', fM(r.ebitda), 'Marginaali ' + fi(r.ebitdaMargin,1) + '%', pos(r.ebitda), true) +
+    kpi('Nettotulos', fM(r.ni), 'Vero 30%', pos(r.ni), true);
+
+  // KPI BOT ROW
+  document.getElementById('kpi-bot').innerHTML =
+    kpi('Kokonaistuotanto', fi(total,0) + ' t WO3', scLabel, total >= 3000 ? 'var(--green)' : '#f59e0b') +
+    kpi('EPS (USD)', fU(r.eps,3), 'A$' + fi(r.epsAUD,3), 'var(--purple)') +
+    kpi('EV/EBITDA Nav', fA(r.navAUD), 'A$ / osake', 'var(--blue)') +
+    kpi('Avg. tavoite', fA(r.avgAUD), 'Painotettu tavoitekurssi', 'var(--gold)');
+
+  // INCOME STATEMENT
+  const mcRev = r.grossRev * (V.mtCarbine / total);
+  const brRev = r.grossRev * (V.barruecopardo / total);
+  const irows = [
+    ['Mt Carbine (' + fi(V.mtCarbine,0) + ' t WO3/a)', mcRev, false, false, null],
+    ['Barruecopardo (' + fi(V.barruecopardo,0) + ' t WO3/a)', brRev, false, false, null],
+    ['Liikevaihto yhteensä', r.grossRev, true, false, 'var(--gold)'],
+    ['AISC-kustannukset', -r.aiscTotal, false, true, null],
+    ['Bruttokate', r.grossProfit, true, false, pos(r.grossProfit)],
+    ['Yhtiön yleiskulut', -V.corpOverhead, false, true, null],
+    ['EBITDA', r.ebitda, true, false, pos(r.ebitda)],
+    ['D&A poistot', -V.da, false, true, null],
+    ['EBIT', r.ebit, true, false, null],
+    ['Vero (30%)', -r.tax, false, true, null],
+    ['Nettotulos', r.ni, true, false, pos(r.ni)],
+    ['EPS (USD/osake)', null, true, false, 'var(--purple)', r.eps],
+  ];
+  document.getElementById('income').innerHTML = irows.map(([lbl,val,bold,ind,col,epsVal])=>{
+    const displayVal = epsVal !== undefined ? fU(epsVal,3)+'/osake' : fi(val,2);
+    const color = col || (val !== null && val < 0 ? 'var(--red)' : 'var(--text)');
+    return `<div class="irow${bold?' bold':''}${ind?' ind':''}">
+      <span class="il">${lbl}</span>
+      <span class="iv" style="color:${color}">${displayVal}</span>
+    </div>`;
+  }).join('');
+
+  // MARGINS
+  document.getElementById('margins').innerHTML = [
+    ['Bruttokate-marginaali', r.cashMargin, 'var(--gold)'],
+    ['EBITDA-marginaali', r.ebitdaMargin, 'var(--green)'],
+    ['Netto-marginaali', r.netMargin, 'var(--purple)'],
+  ].map(([n,p,c])=>`<div class="mrow">
+    <div class="mhdr"><span class="mname">${n}</span><span class="mpct" style="color:${c}">${fi(p,1)}%</span></div>
+    <div class="btrack"><div class="bfill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></div></div>
+  </div>`).join('') +
+  `<div class="mrow"><div class="mhdr">
+    <span class="mname">APT spread (hinta − AISC)</span>
+    <span class="mpct" style="color:${r.spread>=0?'var(--green)':'var(--red)'}">$${fi(r.spread,0)}/mtu</span>
+  </div></div>`;
+
+  // SENSITIVITY TABLE
+  const aptPs = [...new Set([500,1000,1500,2000,V.aptPrice,3000,4000,5000].map(Math.round))].sort((a,b)=>b-a);
+  const totals = [1500, 2500, 3000, 4000, 6000];
+  document.getElementById('senswrap').innerHTML = (() => {
+    let h = `<table class="stbl"><thead><tr><th>Hinta ↓ / WO3 →</th>${totals.map(q=>`<th>${q}t</th>`).join('')}</tr></thead><tbody>`;
+    aptPs.forEach(p => {
+      h += `<tr><td>$${p}</td>`;
+      totals.forEach(q => {
+        const grev = (p*(V.concRealisation/100)*q*100/1e6)*(V.recoveryRate/100);
+        const ebt  = grev - (V.aisc*q*100/1e6) - V.corpOverhead - V.da;
+        const ep   = (ebt > 0 ? ebt*0.70 : ebt) / V.sharesOut;
+        const isB  = Math.abs(p - V.aptPrice) < 13 && Math.abs(q - total) < 200;
+        const good = ep > r.eps * 1.05;
+        const bad  = ep < r.eps * 0.5;
+        const st   = isB ? 'background:var(--gold);color:#111;font-weight:700;border-radius:3px;' :
+                     good ? 'color:var(--green);' : bad ? 'color:var(--red);' : 'color:var(--text-dim);';
+        h += `<td style="${st}">${fi(ep,3)}</td>`;
+      });
+      h += '</tr>';
+    });
+    return h + '</tbody></table>';
+  })();
+
+  // VALUATION BRIDGE
+  const brows = [
+    [`EBITDA $${fi(r.ebitda,1)}M × ${V.evMultiple}x = EV`, fM(r.ev), false, 'var(--blue)'],
+    ['− Netto velka', fM(-V.netDebt), false, 'var(--red)'],
+    ['= Oman pääoman arvo (M USD)', fM(r.equity), true, 'var(--gold)'],
+    ['÷ ' + fi(V.sharesOut,0) + 'M osaketta → USD/osake', fU(r.navUSD,3), false, 'var(--gold)'],
+    ['EV/EBITDA-kurssi (A$/osake)', fA(r.navAUD), true, 'var(--gold)'],
+    ['P/E ' + V.peMultiple + 'x × EPS → kurssi (A$/osake)', fA(r.peAUD), true, 'var(--purple)'],
+    ['Avg. tavoitekurssi (A$/osake)', fA(r.avgAUD), true, 'var(--green)'],
+  ];
+  document.getElementById('bridge').innerHTML = brows.map(([l,v,bold,c])=>
+    `<div class="brow${bold?' bold':''}">
+      <span class="bl">${l}</span>
+      <span class="bv" style="color:${c}">${v}</span>
+    </div>`).join('');
+
+  // STOCK PANEL
+  renderStockPanel(r);
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────
+function resetAll() {
+  V = {...DEFAULTS};
+  SP = 0.345;
+  document.getElementById('sp-input').value = '0.345';
+  buildSliders('price','sl-price');
+  buildSliders('prod', 'sl-prod');
+  buildSliders('cost', 'sl-cost');
+  buildSliders('fin',  'sl-fin');
+  render();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+buildSliders('price','sl-price');
+buildSliders('prod', 'sl-prod');
+buildSliders('cost', 'sl-cost');
+buildSliders('fin',  'sl-fin');
+render();
+</script>
+</body>
+</html>
