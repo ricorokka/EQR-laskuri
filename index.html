@@ -20,33 +20,49 @@
   .logo-bar { width:6px; height:32px; background:linear-gradient(180deg,var(--gold),var(--gold-dim)); border-radius:2px; }
   .logo-text { font-size:17px; font-weight:700; color:#f3f4f6; letter-spacing:-0.01em; }
   .logo-sub { font-size:10px; color:var(--text-muted); font-family:var(--mono); letter-spacing:0.1em; margin-top:1px; }
+  .hdr-btns { display:flex; gap:8px; }
   .reset-btn { padding:7px 16px; background:var(--bg4); border:1px solid #374151; border-radius:6px; color:var(--text-dim); font-size:11px; cursor:pointer; font-family:var(--mono); letter-spacing:0.06em; transition:all .2s; }
   .reset-btn:hover { background:#1f2937; color:var(--text); border-color:var(--gold); }
-  .layout { display:grid; grid-template-columns:360px 1fr; min-height:calc(100vh - 65px); }
+  .layout { display:grid; grid-template-columns:370px 1fr; min-height:calc(100vh - 65px); }
   .left-panel { background:var(--bg2); border-right:1px solid var(--border); padding:20px 22px; overflow-y:auto; height:calc(100vh - 65px); position:sticky; top:65px; }
   .right-panel { padding:20px 28px; overflow-y:auto; }
-  .section { margin-bottom:24px; }
+  .section { margin-bottom:22px; }
   .section-title { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:10px; text-transform:uppercase; letter-spacing:0.12em; font-weight:600; }
   .section-title::before { content:''; display:block; width:16px; height:2px; background:currentColor; flex-shrink:0; }
   .slider-row { margin-bottom:15px; }
   .slider-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
   .slider-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
-  .slider-value { font-family:var(--mono); font-size:14px; font-weight:700; }
-  .slider-sub { font-size:9px; color:#4b5563; margin-bottom:4px; }
-  .track { position:relative; height:5px; background:var(--bg4); border-radius:3px; }
-  .track-fill { position:absolute; left:0; top:0; height:100%; border-radius:3px; pointer-events:none; }
-  .track-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:13px; height:13px; border-radius:50%; border:2px solid var(--bg); pointer-events:none; box-shadow:0 0 8px currentColor; }
-  input[type=range] { position:absolute; top:-6px; left:0; width:100%; height:18px; opacity:0; cursor:pointer; margin:0; }
+  .slider-value { font-family:var(--mono); font-size:14px; font-weight:700; transition:color .2s; }
+  .slider-sub { font-size:9px; color:#4b5563; margin-bottom:5px; line-height:1.4; }
+  .track { position:relative; height:6px; background:var(--bg4); border-radius:3px; }
+  .track-fill { position:absolute; left:0; top:0; height:100%; border-radius:3px; pointer-events:none; transition:width .08s; }
+  .track-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:15px; height:15px; border-radius:50%; border:2px solid var(--bg); pointer-events:none; box-shadow:0 0 8px currentColor; transition:left .08s; }
+  input[type=range] { position:absolute; top:-8px; left:0; width:100%; height:24px; opacity:0; cursor:pointer; margin:0; }
   .slim { display:flex; justify-content:space-between; font-size:9px; color:#374151; margin-top:2px; }
+
+  /* ── SCENARIO BUTTONS ── */
+  .sc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:6px; }
+  .sc-btn { padding:8px 4px; background:var(--bg4); border:1.5px solid #374151; border-radius:7px; color:var(--text-dim); font-size:10px; font-family:var(--mono); cursor:pointer; text-align:center; transition:all .2s; letter-spacing:0.03em; line-height:1.3; }
+  .sc-btn:hover { border-color:var(--text-muted); color:var(--text); background:#1a2636; }
+  .sc-btn.active { border-color:var(--gold); color:var(--gold); background:#1a1a10; box-shadow:0 0 12px rgba(200,169,110,0.12); }
+  .sc-btn .sc-icon { font-size:14px; display:block; margin-bottom:2px; }
+  .sc-btn .sc-name { font-weight:700; font-size:10px; }
+  .sc-btn .sc-detail { font-size:8px; color:#4b5563; margin-top:1px; }
+  .sc-btn.active .sc-detail { color:var(--gold-dim); }
+  .sc-info { font-size:9px; color:#4b5563; line-height:1.5; margin-bottom:16px; padding:8px 10px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--gold-dim); }
+  .sc-info b { color:var(--text-muted); font-weight:600; }
+
   .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
   .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-  .kpi { padding:12px 14px; background:var(--bg3); border:1px solid transparent; border-radius:8px; position:relative; overflow:hidden; }
+  .kpi { padding:12px 14px; background:var(--bg3); border:1px solid transparent; border-radius:8px; position:relative; overflow:hidden; transition:border-color .2s, transform .15s; }
+  .kpi:hover { border-color:var(--kpi-color,var(--gold)); transform:translateY(-1px); }
   .kpi::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--kpi-color,var(--gold)); }
   .kpi-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
   .kpi-val { font-family:var(--mono); font-weight:700; color:var(--kpi-color,var(--gold)); line-height:1; }
   .kpi-val.big { font-size:20px; } .kpi-val.med { font-size:16px; }
   .kpi-sub { font-size:9px; color:var(--text-muted); margin-top:4px; }
-  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; }
+  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; transition:border-color .2s; }
+  .card:hover { border-color:#2a3a4e; }
   .card-title { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-family:var(--mono); }
   .irow { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
   .irow.bold { border-top:1px solid var(--border); margin-top:2px; padding-top:6px; }
@@ -74,7 +90,12 @@
   .bv { font-family:var(--mono); font-size:12px; }
   .brow.bold .bv { font-size:13px; font-weight:700; }
   .disclaimer { font-size:9px; color:#374151; margin-top:14px; line-height:1.7; }
-  @media(max-width:900px){.layout{grid-template-columns:1fr;}.left-panel{position:static;height:auto;}.g4{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .left-panel{position:static;height:auto;}
+    .g4{grid-template-columns:repeat(2,1fr);}
+    .sc-grid{grid-template-columns:repeat(2,1fr);}
+  }
 </style>
 </head>
 <body>
@@ -86,11 +107,44 @@
       <div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div>
     </div>
   </div>
-  <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+  <div class="hdr-btns">
+    <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+  </div>
 </header>
 
 <div class="layout">
   <div class="left-panel">
+
+    <!-- SCENARIO PRESETS -->
+    <div class="section">
+      <div class="section-title" style="color:var(--gold)">Skenaariot</div>
+      <div class="sc-grid" id="sc-btns">
+        <button class="sc-btn" onclick="loadScenario('bear')" id="sc-bear">
+          <span class="sc-icon">🐻</span>
+          <span class="sc-name">Bear</span>
+          <span class="sc-detail">APT $1 200</span>
+        </button>
+        <button class="sc-btn active" onclick="loadScenario('base')" id="sc-base">
+          <span class="sc-icon">📍</span>
+          <span class="sc-name">Base</span>
+          <span class="sc-detail">APT $2 160</span>
+        </button>
+        <button class="sc-btn" onclick="loadScenario('bull')" id="sc-bull">
+          <span class="sc-icon">🚀</span>
+          <span class="sc-name">Bull</span>
+          <span class="sc-detail">APT $3 500</span>
+        </button>
+        <button class="sc-btn" onclick="loadScenario('mega')" id="sc-mega">
+          <span class="sc-icon">🔭</span>
+          <span class="sc-name">Mega</span>
+          <span class="sc-detail">APT $5 000</span>
+        </button>
+      </div>
+      <div class="sc-info" id="sc-desc">
+        <b>Base-skenaario:</b> APT CIF Rotterdam maaliskuun 2026 tasolla (~$2 160/mtu). Mt Carbine ja Barruecopardo tuottavat johdon ohjausalueella. Kaikki parametrit ovat säädettävissä — valitse skenaario lähtöpisteeksi ja hienosäädä slidereillä.
+      </div>
+    </div>
+
     <div class="section">
       <div class="section-title" style="color:var(--gold)">Tungsten-hinta</div>
       <div id="sl-price"></div>
@@ -121,7 +175,7 @@
           <input id="sp-input" type="number" value="0.345" step="0.005" min="0.001" oninput="onSP()"
             style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);background:transparent;border:none;border-bottom:1px solid #374151;width:90px;outline:none;padding:2px 0;">
         </div>
-        <div style="font-size:9px;color:#4b5563;margin-top:3px;">Päivitä itse</div>
+        <div style="font-size:9px;color:#4b5563;margin-top:3px;">Syötä osakekurssi</div>
       </div>
       <!-- mkt cap -->
       <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
@@ -178,36 +232,57 @@
       <div class="card-title">▸ Arvostussilta (A$/osake)</div>
       <div id="bridge"></div>
     </div>
-    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. EQR:n tulos riippuu tuotantoluvuista, rahoitusrakenteesta, hedge-sopimuksista ja lainanhoitokuluista. Käytä omaa harkintaa.</div>
+    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. EQR:n tulos riippuu tuotantoluvuista, rahoitusrakenteesta, hedge-sopimuksista ja lainanhoitokuluista. Käytä omaa harkintaa.<br><br>📊 Oletusarvot: APT ~$2 160/mtu CIF Rotterdam (maaliskuu 2026), AUD/USD ~0.700, osakkeet ~4 800M, kurssi A$0.345, 52vk A$0.028–A$0.390. Lähteet: Fastmarkets, Investing.com, SMM.</div>
   </div>
 </div>
 
 <script>
-// ── DEFAULTS ──────────────────────────────────────────────────────────────
+// ── DEFAULTS (BASE SCENARIO) ─────────────────────────────────────────────
 const DEFAULTS = {
-  aptPrice:             1500,  // APT CIF Rotterdam maaliskuu 2026 ~$2160, käyttäjä voi säätää
-  concRealisation:        75,  // % APT-pariteettiin (EQR myy pääosin concentraattia)
-  mtCarbine:            1400,  // t WO3/a — nyt ~1200, johdon tavoite ~1750 (2026)
-  barruecopardo:        1600,  // t WO3/a — Espanja, kapasiteetti ~1600
-  recoveryRate:           78,  // % — APT-pilottilaitoksella tavoite 95%
-  c1Cost:                155,  // USD/mtu
-  aisc:                  220,  // USD/mtu all-in sustaining
-  corpOverhead:           12,  // M USD/a — kaksi kaivosta
-  da:                     15,  // M USD/a
-  sharesOut:            4800,  // milj. osaketta (~4.79 mrd, maaliskuu 2026)
-  netDebt:                45,  // M USD
+  aptPrice:             2160,
+  concRealisation:        75,
+  mtCarbine:            1400,
+  barruecopardo:        1600,
+  recoveryRate:           78,
+  c1Cost:                155,
+  aisc:                  220,
+  corpOverhead:           12,
+  da:                     15,
+  sharesOut:            4800,
+  netDebt:                45,
   evMultiple:            8.0,
   peMultiple:           10.0,
-  audUsd:              0.635,
+  audUsd:              0.700,
+};
+
+// ── SCENARIO PRESETS ─────────────────────────────────────────────────────
+const SCENARIOS = {
+  bear: {
+    desc: '<b>Bear-skenaario:</b> APT palaa $1 200/mtu tasolle (lähelle 2024 hintoja). Mt Carbine tuottaa nykytasolla, Barruecopardo käynnistyy hitaasti. Konservatiivinen arvostus, laimennus huomioitu.',
+    values: { aptPrice:1200, concRealisation:70, mtCarbine:1000, barruecopardo:1200, recoveryRate:75, c1Cost:170, aisc:250, corpOverhead:14, da:15, sharesOut:5200, netDebt:60, evMultiple:6.0, peMultiple:8.0, audUsd:0.700 }
+  },
+  base: {
+    desc: '<b>Base-skenaario:</b> APT CIF Rotterdam maaliskuun 2026 tasolla (~$2 160/mtu). Mt Carbine ja Barruecopardo tuottavat johdon ohjausalueella. Kaikki parametrit ovat säädettävissä — valitse skenaario lähtöpisteeksi ja hienosäädä slidereillä.',
+    values: { ...DEFAULTS }
+  },
+  bull: {
+    desc: '<b>Bull-skenaario:</b> APT nousee $3 500/mtu tasolle Kiinan vientirajoitusten tiukennusten myötä. Molemmat kaivokset täydellä kapasiteetilla, APT-pilottilaitos nostaa recovery-asteen 90%:iin.',
+    values: { aptPrice:3500, concRealisation:78, mtCarbine:1750, barruecopardo:2000, recoveryRate:90, c1Cost:155, aisc:220, corpOverhead:12, da:18, sharesOut:4800, netDebt:30, evMultiple:10.0, peMultiple:14.0, audUsd:0.700 }
+  },
+  mega: {
+    desc: '<b>Mega-skenaario:</b> APT supercycle $5 000+/mtu. Täysi tuotantokapasiteetti molemmilla kaivoksilla, APT-prosessointi nostaa realisaation 85%:iin. Spekulatiivinen — hintapiikin vaikutusten mallinnus.',
+    values: { aptPrice:5000, concRealisation:85, mtCarbine:2000, barruecopardo:2500, recoveryRate:92, c1Cost:155, aisc:220, corpOverhead:14, da:20, sharesOut:5000, netDebt:20, evMultiple:8.0, peMultiple:12.0, audUsd:0.700 }
+  }
 };
 
 let V = {...DEFAULTS};
-let SP = 0.345; // A$ osakekurssi
+let SP = 0.345;
+let activeScenario = 'base';
 
 // ── SLIDER DEFINITIONS ────────────────────────────────────────────────────
 const SLIDERS = {
   price: [
-    { key:'aptPrice',         label:'APT spot-hinta',              min:200,  max:5000, step:25,    unit:'USD/mtu',  sub:'CIF Rotterdam — maaliskuu 2026: ~$2 160/mtu', color:'var(--gold)' },
+    { key:'aptPrice',         label:'APT spot-hinta',              min:200,  max:6000, step:25,    unit:'USD/mtu',  sub:'CIF Rotterdam — maaliskuu 2026: ~$2 160/mtu', color:'var(--gold)' },
     { key:'concRealisation',  label:'Concentraatti-realisaatio',   min:40,   max:95,   step:1,     unit:'%',        sub:'% APT-pariteettiin — EQR myy concentraattia', color:'#a78540' },
   ],
   prod: [
@@ -226,7 +301,7 @@ const SLIDERS = {
     { key:'netDebt',          label:'Netto velka',                 min:0,    max:200,  step:2,     unit:'M USD',    sub:'Velka − kassa M USD',                          color:'#10b981' },
     { key:'evMultiple',       label:'EV/EBITDA-kerroin',           min:3,    max:20,   step:0.5,   unit:'x',        sub:'Vertaisarvostuskerroin',                         color:'#059669' },
     { key:'peMultiple',       label:'P/E-kerroin',                 min:5,    max:40,   step:0.5,   unit:'x',        sub:'Osakekurssitavoitteen P/E-pohja',               color:'#047857' },
-    { key:'audUsd',           label:'AUD/USD',                     min:0.50, max:0.80, step:0.005, unit:'kurssi',   sub:'Valuuttakurssi',                                 color:'#6ee7b7' },
+    { key:'audUsd',           label:'AUD/USD',                     min:0.55, max:0.80, step:0.005, unit:'kurssi',   sub:'Nyt ~0.700 (maaliskuu 2026)',                    color:'#6ee7b7' },
   ],
 };
 
@@ -256,14 +331,13 @@ function calc(p) {
   const ebit        = ebitda - p.da;
   const tax         = ebit > 0 ? ebit * 0.30 : 0;
   const ni          = ebit - tax;
-  const eps         = ni / p.sharesOut;          // USD per share
+  const eps         = ni / p.sharesOut;
   const epsAUD      = eps / p.audUsd;
   const ebitdaMargin= grossRev > 0 ? ebitda / grossRev * 100 : 0;
   const netMargin   = grossRev > 0 ? ni / grossRev * 100 : 0;
   const cashMargin  = grossRev > 0 ? grossProfit / grossRev * 100 : 0;
   const spread      = p.aptPrice - p.aisc;
 
-  // Valuation
   const ev       = ebitda * p.evMultiple;
   const equity   = ev - p.netDebt;
   const navUSD   = equity / p.sharesOut;
@@ -274,6 +348,27 @@ function calc(p) {
   return { totalWO3, grossRev, aiscTotal, grossProfit, ebitda, ebit, tax, ni,
            eps, epsAUD, ebitdaMargin, netMargin, cashMargin, spread,
            ev, equity, navUSD, navAUD, peAUD, avgAUD };
+}
+
+// ── SCENARIO MANAGEMENT ──────────────────────────────────────────────────
+function loadScenario(key) {
+  const sc = SCENARIOS[key];
+  if (!sc) return;
+  activeScenario = key;
+  V = {...sc.values};
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sc-' + key).classList.add('active');
+  document.getElementById('sc-desc').innerHTML = sc.desc;
+  rebuildAll();
+  render();
+}
+
+function markCustom() {
+  if (activeScenario !== 'custom') {
+    activeScenario = 'custom';
+    document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sc-desc').innerHTML = '<b>Omat asetukset:</b> Olet muokannut parametreja käsin. Valitse skenaario palauttaaksesi esiasetetut arvot.';
+  }
 }
 
 // ── SLIDER BUILD ──────────────────────────────────────────────────────────
@@ -301,6 +396,13 @@ function buildSliders(group, containerId) {
   });
 }
 
+function rebuildAll() {
+  buildSliders('price','sl-price');
+  buildSliders('prod', 'sl-prod');
+  buildSliders('cost', 'sl-cost');
+  buildSliders('fin',  'sl-fin');
+}
+
 function onSlider(key, unit, min, max, raw) {
   const val = parseFloat(raw);
   V[key] = val;
@@ -308,6 +410,7 @@ function onSlider(key, unit, min, max, raw) {
   document.getElementById('sv-'+key).textContent = fmtSV(val, unit);
   document.getElementById('tf-'+key).style.width = pct + '%';
   document.getElementById('tt-'+key).style.left  = pct + '%';
+  markCustom();
   render();
 }
 
@@ -323,7 +426,7 @@ function kpi(label, val, sub, color, big) {
 // ── STOCK PANEL ───────────────────────────────────────────────────────────
 function renderStockPanel(r) {
   const sp  = SP;
-  const mcAUD = sp * V.sharesOut;      // M AUD
+  const mcAUD = sp * V.sharesOut;
   const mcUSD = mcAUD * V.audUsd;
 
   const col = v => v >= 0 ? 'var(--green)' : 'var(--red)';
@@ -424,8 +527,8 @@ function render() {
   </div></div>`;
 
   // SENSITIVITY TABLE
-  const aptPs = [...new Set([500,1000,1500,2000,V.aptPrice,3000,4000,5000].map(Math.round))].sort((a,b)=>b-a);
-  const totals = [1500, 2500, 3000, 4000, 6000];
+  const aptPs = [...new Set([500,1000,1500,2000,V.aptPrice,2500,3000,4000,5000].map(Math.round))].sort((a,b)=>b-a);
+  const totals = [1500, 2500, 3000, 3500, 5000];
   document.getElementById('senswrap').innerHTML = (() => {
     let h = `<table class="stbl"><thead><tr><th>Hinta ↓ / WO3 →</th>${totals.map(q=>`<th>${q}t</th>`).join('')}</tr></thead><tbody>`;
     aptPs.forEach(p => {
@@ -468,21 +571,14 @@ function render() {
 
 // ── RESET ─────────────────────────────────────────────────────────────────
 function resetAll() {
-  V = {...DEFAULTS};
+  loadScenario('base');
   SP = 0.345;
   document.getElementById('sp-input').value = '0.345';
-  buildSliders('price','sl-price');
-  buildSliders('prod', 'sl-prod');
-  buildSliders('cost', 'sl-cost');
-  buildSliders('fin',  'sl-fin');
   render();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-buildSliders('price','sl-price');
-buildSliders('prod', 'sl-prod');
-buildSliders('cost', 'sl-cost');
-buildSliders('fin',  'sl-fin');
+rebuildAll();
 render();
 </script>
 </body>
