@@ -9,8 +9,8 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --gold: #c8a96e; --gold-dim: #92651a; --blue: #60a5fa; --green: #34d399;
-    --red: #f87171; --purple: #a78bfa; --bg: #070d14; --bg2: #050b10;
-    --bg3: #0a0f16; --bg4: #0f1923; --border: #1a2332;
+    --red: #f87171; --purple: #a78bfa; --cyan: #22d3ee; --orange: #fb923c;
+    --bg: #070d14; --bg2: #050b10; --bg3: #0a0f16; --bg4: #0f1923; --border: #1a2332;
     --text: #e5e7eb; --text-dim: #9ca3af; --text-muted: #6b7280;
     --mono: 'IBM Plex Mono', monospace; --sans: 'Barlow', sans-serif;
   }
@@ -20,7 +20,6 @@
   .logo-bar { width:6px; height:32px; background:linear-gradient(180deg,var(--gold),var(--gold-dim)); border-radius:2px; }
   .logo-text { font-size:17px; font-weight:700; color:#f3f4f6; letter-spacing:-0.01em; }
   .logo-sub { font-size:10px; color:var(--text-muted); font-family:var(--mono); letter-spacing:0.1em; margin-top:1px; }
-  .hdr-btns { display:flex; gap:8px; }
   .reset-btn { padding:7px 16px; background:var(--bg4); border:1px solid #374151; border-radius:6px; color:var(--text-dim); font-size:11px; cursor:pointer; font-family:var(--mono); letter-spacing:0.06em; transition:all .2s; }
   .reset-btn:hover { background:#1f2937; color:var(--text); border-color:var(--gold); }
   .layout { display:grid; grid-template-columns:370px 1fr; min-height:calc(100vh - 65px); }
@@ -32,36 +31,33 @@
   .slider-row { margin-bottom:15px; }
   .slider-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
   .slider-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
-  .slider-value { font-family:var(--mono); font-size:14px; font-weight:700; transition:color .2s; }
+  .slider-value { font-family:var(--mono); font-size:14px; font-weight:700; }
   .slider-sub { font-size:9px; color:#4b5563; margin-bottom:5px; line-height:1.4; }
   .track { position:relative; height:6px; background:var(--bg4); border-radius:3px; }
-  .track-fill { position:absolute; left:0; top:0; height:100%; border-radius:3px; pointer-events:none; transition:width .08s; }
-  .track-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:15px; height:15px; border-radius:50%; border:2px solid var(--bg); pointer-events:none; box-shadow:0 0 8px currentColor; transition:left .08s; }
+  .track-fill { position:absolute; left:0; top:0; height:100%; border-radius:3px; pointer-events:none; }
+  .track-thumb { position:absolute; top:50%; transform:translate(-50%,-50%); width:15px; height:15px; border-radius:50%; border:2px solid var(--bg); pointer-events:none; box-shadow:0 0 8px currentColor; }
   input[type=range] { position:absolute; top:-8px; left:0; width:100%; height:24px; opacity:0; cursor:pointer; margin:0; }
   .slim { display:flex; justify-content:space-between; font-size:9px; color:#374151; margin-top:2px; }
-
-  /* ── SCENARIO BUTTONS ── */
   .sc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:6px; }
-  .sc-btn { padding:8px 4px; background:var(--bg4); border:1.5px solid #374151; border-radius:7px; color:var(--text-dim); font-size:10px; font-family:var(--mono); cursor:pointer; text-align:center; transition:all .2s; letter-spacing:0.03em; line-height:1.3; }
-  .sc-btn:hover { border-color:var(--text-muted); color:var(--text); background:#1a2636; }
-  .sc-btn.active { border-color:var(--gold); color:var(--gold); background:#1a1a10; box-shadow:0 0 12px rgba(200,169,110,0.12); }
+  .sc-btn { padding:8px 4px; background:var(--bg4); border:1.5px solid #374151; border-radius:7px; color:var(--text-dim); font-size:10px; font-family:var(--mono); cursor:pointer; text-align:center; transition:all .2s; line-height:1.3; }
+  .sc-btn:hover { border-color:var(--text-muted); color:var(--text); }
+  .sc-btn.active { border-color:var(--gold); color:var(--gold); background:#1a1a10; }
   .sc-btn .sc-icon { font-size:14px; display:block; margin-bottom:2px; }
   .sc-btn .sc-name { font-weight:700; font-size:10px; }
   .sc-btn .sc-detail { font-size:8px; color:#4b5563; margin-top:1px; }
   .sc-btn.active .sc-detail { color:var(--gold-dim); }
   .sc-info { font-size:9px; color:#4b5563; line-height:1.5; margin-bottom:16px; padding:8px 10px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--gold-dim); }
   .sc-info b { color:var(--text-muted); font-weight:600; }
-
   .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
   .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
-  .kpi { padding:12px 14px; background:var(--bg3); border:1px solid transparent; border-radius:8px; position:relative; overflow:hidden; transition:border-color .2s, transform .15s; }
-  .kpi:hover { border-color:var(--kpi-color,var(--gold)); transform:translateY(-1px); }
+  .kpi { padding:12px 14px; background:var(--bg3); border:1px solid transparent; border-radius:8px; position:relative; overflow:hidden; transition:border-color .2s; }
+  .kpi:hover { border-color:var(--kpi-color,var(--gold)); }
   .kpi::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--kpi-color,var(--gold)); }
   .kpi-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
   .kpi-val { font-family:var(--mono); font-weight:700; color:var(--kpi-color,var(--gold)); line-height:1; }
   .kpi-val.big { font-size:20px; } .kpi-val.med { font-size:16px; }
   .kpi-sub { font-size:9px; color:var(--text-muted); margin-top:4px; }
-  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; transition:border-color .2s; }
+  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; }
   .card:hover { border-color:#2a3a4e; }
   .card-title { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-family:var(--mono); }
   .irow { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
@@ -90,11 +86,29 @@
   .bv { font-family:var(--mono); font-size:12px; }
   .brow.bold .bv { font-size:13px; font-weight:700; }
   .disclaimer { font-size:9px; color:#374151; margin-top:14px; line-height:1.7; }
+  /* tabs */
+  .tabs { display:flex; gap:2px; margin-bottom:18px; flex-wrap:wrap; }
+  .tab { padding:8px 14px; background:var(--bg4); border:1px solid var(--border); border-radius:7px 7px 0 0; color:var(--text-muted); font-size:10px; font-family:var(--mono); cursor:pointer; letter-spacing:0.06em; transition:all .15s; text-transform:uppercase; }
+  .tab:hover { color:var(--text); border-color:var(--text-muted); }
+  .tab.active { background:var(--bg3); color:var(--gold); border-color:var(--gold); border-bottom-color:var(--bg3); }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+  /* monte carlo canvas */
+  .mc-canvas { width:100%; height:220px; background:var(--bg4); border-radius:6px; margin-top:10px; }
+  /* peer table */
+  .ptbl { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:10px; }
+  .ptbl th { padding:6px 8px; color:var(--text-muted); text-align:right; border-bottom:1px solid var(--border); font-weight:400; text-transform:uppercase; letter-spacing:0.06em; }
+  .ptbl th:first-child { text-align:left; }
+  .ptbl td { padding:5px 8px; text-align:right; }
+  .ptbl td:first-child { text-align:left; color:var(--text-dim); font-weight:600; }
+  .ptbl tr:nth-child(even) td { background:#080e15; }
+  .ptbl tr.hl td { background:rgba(200,169,110,0.08); color:var(--gold); }
   @media(max-width:900px){
     .layout{grid-template-columns:1fr;}
     .left-panel{position:static;height:auto;}
     .g4{grid-template-columns:repeat(2,1fr);}
     .sc-grid{grid-template-columns:repeat(2,1fr);}
+    .tabs{overflow-x:auto;}
   }
 </style>
 </head>
@@ -102,112 +116,51 @@
 <header>
   <div class="logo">
     <div class="logo-bar"></div>
-    <div>
-      <div class="logo-text">EQ Resources</div>
-      <div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div>
-    </div>
+    <div><div class="logo-text">EQ Resources</div><div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div></div>
   </div>
-  <div class="hdr-btns">
-    <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
-  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
 </header>
 
 <div class="layout">
   <div class="left-panel">
-
-    <!-- SCENARIO PRESETS -->
     <div class="section">
       <div class="section-title" style="color:var(--gold)">Skenaariot</div>
-      <div class="sc-grid" id="sc-btns">
-        <button class="sc-btn" onclick="loadScenario('bear')" id="sc-bear">
-          <span class="sc-icon">🐻</span>
-          <span class="sc-name">Bear</span>
-          <span class="sc-detail">APT $1 200</span>
-        </button>
-        <button class="sc-btn active" onclick="loadScenario('base')" id="sc-base">
-          <span class="sc-icon">📍</span>
-          <span class="sc-name">Base</span>
-          <span class="sc-detail">APT $2 160</span>
-        </button>
-        <button class="sc-btn" onclick="loadScenario('bull')" id="sc-bull">
-          <span class="sc-icon">🚀</span>
-          <span class="sc-name">Bull</span>
-          <span class="sc-detail">APT $3 500</span>
-        </button>
-        <button class="sc-btn" onclick="loadScenario('mega')" id="sc-mega">
-          <span class="sc-icon">🔭</span>
-          <span class="sc-name">Mega</span>
-          <span class="sc-detail">APT $5 000</span>
-        </button>
+      <div class="sc-grid">
+        <button class="sc-btn" onclick="loadScenario('bear')" id="sc-bear"><span class="sc-icon">🐻</span><span class="sc-name">Bear</span><span class="sc-detail">APT $1 200</span></button>
+        <button class="sc-btn active" onclick="loadScenario('base')" id="sc-base"><span class="sc-icon">📍</span><span class="sc-name">Base</span><span class="sc-detail">APT $2 160</span></button>
+        <button class="sc-btn" onclick="loadScenario('bull')" id="sc-bull"><span class="sc-icon">🚀</span><span class="sc-name">Bull</span><span class="sc-detail">APT $3 500</span></button>
+        <button class="sc-btn" onclick="loadScenario('mega')" id="sc-mega"><span class="sc-icon">🔭</span><span class="sc-name">Mega</span><span class="sc-detail">APT $5 000</span></button>
       </div>
-      <div class="sc-info" id="sc-desc">
-        <b>Base-skenaario:</b> APT CIF Rotterdam maaliskuun 2026 tasolla (~$2 160/mtu). Mt Carbine ja Barruecopardo tuottavat johdon ohjausalueella. Kaikki parametrit ovat säädettävissä — valitse skenaario lähtöpisteeksi ja hienosäädä slidereillä.
-      </div>
+      <div class="sc-info" id="sc-desc"><b>Base-skenaario:</b> APT $2 160/mtu (maaliskuu 2026). Valitse skenaario lähtöpisteeksi ja hienosäädä slidereillä.</div>
     </div>
-
+    <div class="section"><div class="section-title" style="color:var(--gold)">Tungsten-hinta</div><div id="sl-price"></div></div>
+    <div class="section"><div class="section-title" style="color:var(--blue)">Tuotanto</div><div id="sl-prod"></div></div>
+    <div class="section"><div class="section-title" style="color:var(--red)">Kustannukset</div><div id="sl-cost"></div></div>
+    <div class="section"><div class="section-title" style="color:var(--green)">Rahoitus & Arvostus</div><div id="sl-fin"></div></div>
     <div class="section">
-      <div class="section-title" style="color:var(--gold)">Tungsten-hinta</div>
-      <div id="sl-price"></div>
-    </div>
-    <div class="section">
-      <div class="section-title" style="color:var(--blue)">Tuotanto</div>
-      <div id="sl-prod"></div>
-    </div>
-    <div class="section">
-      <div class="section-title" style="color:var(--red)">Kustannukset</div>
-      <div id="sl-cost"></div>
-    </div>
-    <div class="section">
-      <div class="section-title" style="color:var(--green)">Rahoitus & Arvostus</div>
-      <div id="sl-fin"></div>
+      <div class="section-title" style="color:var(--cyan)">DCF-parametrit</div>
+      <div id="sl-dcf"></div>
     </div>
   </div>
 
   <div class="right-panel">
-
     <!-- STOCK PRICE PANEL -->
     <div style="display:flex;align-items:stretch;gap:0;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex-wrap:wrap;">
-      <!-- input -->
       <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:170px;">
         <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">ASX: EQR — Kurssi (A$)</div>
         <div style="display:flex;align-items:baseline;gap:4px;">
           <span style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">A$</span>
-          <input id="sp-input" type="number" value="0.345" step="0.005" min="0.001" oninput="onSP()"
-            style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);background:transparent;border:none;border-bottom:1px solid #374151;width:90px;outline:none;padding:2px 0;">
+          <input id="sp-input" type="number" value="0.345" step="0.005" min="0.001" oninput="onSP()" style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);background:transparent;border:none;border-bottom:1px solid #374151;width:90px;outline:none;padding:2px 0;">
         </div>
         <div style="font-size:9px;color:#4b5563;margin-top:3px;">Syötä osakekurssi</div>
       </div>
-      <!-- mkt cap -->
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Markkina-arvo</div>
-        <div id="sp-mktcap" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);"></div>
-        <div id="sp-mktcap-usd" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
-      </div>
-      <!-- ev upside -->
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EV/EBITDA upside</div>
-        <div id="sp-ev" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div>
-        <div id="sp-ev-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
-      </div>
-      <!-- pe upside -->
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">P/E upside</div>
-        <div id="sp-pe" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div>
-        <div id="sp-pe-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
-      </div>
-      <!-- avg upside -->
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Avg. tavoite</div>
-        <div id="sp-avg" style="font-family:var(--mono);font-size:22px;font-weight:700;"></div>
-        <div id="sp-avg-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div>
-      </div>
-      <!-- 52wk bar -->
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Markkina-arvo</div><div id="sp-mktcap" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);"></div><div id="sp-mktcap-usd" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EV/EBITDA upside</div><div id="sp-ev" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-ev-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">DCF upside</div><div id="sp-dcf" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-dcf-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Avg. tavoite</div><div id="sp-avg" style="font-family:var(--mono);font-size:22px;font-weight:700;"></div><div id="sp-avg-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
       <div style="padding:14px 18px;flex:2;min-width:180px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">52vk &nbsp;<span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span></div>
-        <div style="position:relative;height:6px;background:var(--bg4);border-radius:3px;">
-          <div id="sp-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#374151,var(--gold));border-radius:3px;"></div>
-          <div id="sp-bar-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);box-shadow:0 0 6px var(--gold);"></div>
-        </div>
+        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">52vk <span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span></div>
+        <div style="position:relative;height:6px;background:var(--bg4);border-radius:3px;"><div id="sp-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#374151,var(--gold));border-radius:3px;"></div><div id="sp-bar-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);box-shadow:0 0 6px var(--gold);"></div></div>
         <div style="display:flex;justify-content:space-between;font-size:9px;color:#4b5563;margin-top:3px;"><span>A$0.028</span><span>A$0.390</span></div>
       </div>
     </div>
@@ -215,371 +168,525 @@
     <div class="g3" id="kpi-top"></div>
     <div class="g4" id="kpi-bot"></div>
 
-    <div class="card">
-      <div class="card-title">▸ Tuloslaskelma (M USD)</div>
-      <div id="income"></div>
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchTab('core')">Perusmalli</div>
+      <div class="tab" onclick="switchTab('dcf')">DCF</div>
+      <div class="tab" onclick="switchTab('breakeven')">Breakeven</div>
+      <div class="tab" onclick="switchTab('peers')">Vertailuarvostus</div>
+      <div class="tab" onclick="switchTab('nav')">NAV-erittely</div>
+      <div class="tab" onclick="switchTab('timeline')">2026–2030</div>
+      <div class="tab" onclick="switchTab('mc')">Monte Carlo</div>
     </div>
-    <div class="card">
-      <div class="card-title">▸ Marginaalit & Spredit</div>
-      <div id="margins"></div>
+
+    <!-- TAB: CORE -->
+    <div class="tab-content active" id="tc-core">
+      <div class="card"><div class="card-title">▸ Tuloslaskelma (M USD)</div><div id="income"></div></div>
+      <div class="card"><div class="card-title">▸ Marginaalit & Spredit</div><div id="margins"></div></div>
+      <div class="card"><div class="card-title">▸ Herkkyysanalyysi — EPS (USD)</div><div style="overflow-x:auto;" id="senswrap"></div><div style="font-size:9px;color:#4b5563;margin-top:8px;">* Korostettu = nykyiset parametrit | Vihreä = parempi | Punainen = alle 50% base</div></div>
+      <div class="card"><div class="card-title">▸ Arvostussilta (A$/osake)</div><div id="bridge"></div></div>
     </div>
-    <div class="card">
-      <div class="card-title">▸ Herkkyysanalyysi — EPS (USD) &nbsp;<span style="color:#4b5563;font-size:9px;">APT-hinta vs. WO3 kokonaistuotanto</span></div>
-      <div style="overflow-x:auto;" id="senswrap"></div>
-      <div style="font-size:9px;color:#4b5563;margin-top:8px;">* Korostettu solu = nykyiset parametrit &nbsp;|&nbsp; Vihreä = parempi kuin base &nbsp;|&nbsp; Punainen = alle 50% base-EPS</div>
+
+    <!-- TAB: DCF -->
+    <div class="tab-content" id="tc-dcf">
+      <div class="card"><div class="card-title">▸ DCF — Diskontattu kassavirta-analyysi</div><div id="dcf-detail"></div></div>
+      <div class="card"><div class="card-title">▸ DCF-herkkyys — WACC vs. Terminaalikasvu</div><div style="overflow-x:auto;" id="dcf-sens"></div></div>
     </div>
-    <div class="card">
-      <div class="card-title">▸ Arvostussilta (A$/osake)</div>
-      <div id="bridge"></div>
+
+    <!-- TAB: BREAKEVEN -->
+    <div class="tab-content" id="tc-breakeven">
+      <div class="card"><div class="card-title">▸ Kaivoskohtainen breakeven-analyysi</div><div id="breakeven-detail"></div></div>
     </div>
-    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. EQR:n tulos riippuu tuotantoluvuista, rahoitusrakenteesta, hedge-sopimuksista ja lainanhoitokuluista. Käytä omaa harkintaa.<br><br>📊 Oletusarvot: APT ~$2 160/mtu CIF Rotterdam (maaliskuu 2026), AUD/USD ~0.700, osakkeet ~4 800M, kurssi A$0.345, 52vk A$0.028–A$0.390. Lähteet: Fastmarkets, Investing.com, SMM.</div>
+
+    <!-- TAB: PEERS -->
+    <div class="tab-content" id="tc-peers">
+      <div class="card"><div class="card-title">▸ Vertailuarvostus — Tungsten-yhtiöt</div><div id="peer-detail"></div></div>
+    </div>
+
+    <!-- TAB: NAV -->
+    <div class="tab-content" id="tc-nav">
+      <div class="card"><div class="card-title">▸ Osakekohtainen NAV-erittely (Sum-of-the-Parts)</div><div id="nav-detail"></div></div>
+    </div>
+
+    <!-- TAB: TIMELINE -->
+    <div class="tab-content" id="tc-timeline">
+      <div class="card"><div class="card-title">▸ 5-vuotisennuste 2026–2030 (M USD)</div><div style="overflow-x:auto;" id="timeline-detail"></div></div>
+    </div>
+
+    <!-- TAB: MONTE CARLO -->
+    <div class="tab-content" id="tc-mc">
+      <div class="card"><div class="card-title">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;">Satunnainen APT-hinta (±40%), tuotanto (±25%), recovery (±10%), AISC (±20%). Lognormaalijakauma.</div></div>
+    </div>
+
+    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. Käytä omaa harkintaa.<br>📊 Oletusarvot: APT ~$2 160/mtu (3/2026), AUD/USD ~0.700, osakkeet ~4 800M. Lähteet: Fastmarkets, Investing.com, SMM.</div>
   </div>
 </div>
 
 <script>
-// ── DEFAULTS (BASE SCENARIO) ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// DEFAULTS & SCENARIOS
+// ═══════════════════════════════════════════════════════════════════════════
 const DEFAULTS = {
-  aptPrice:             2160,
-  concRealisation:        75,
-  mtCarbine:            1400,
-  barruecopardo:        1600,
-  recoveryRate:           78,
-  c1Cost:                155,
-  aisc:                  220,
-  corpOverhead:           12,
-  da:                     15,
-  sharesOut:            4800,
-  netDebt:                45,
-  evMultiple:            8.0,
-  peMultiple:           10.0,
-  audUsd:              0.700,
+  aptPrice:2160, concRealisation:75, mtCarbine:1400, barruecopardo:1600,
+  recoveryRate:78, c1Cost:155, aisc:220, corpOverhead:12, da:15,
+  sharesOut:4800, netDebt:45, evMultiple:8.0, peMultiple:10.0, audUsd:0.700,
+  // DCF params
+  wacc:12, terminalGrowth:2, forecastYears:8, capex:10, nwcPct:5,
+  // Mine-specific costs
+  mcAisc:240, brAisc:200, mcConc:72, brConc:78,
 };
-
-// ── SCENARIO PRESETS ─────────────────────────────────────────────────────
 const SCENARIOS = {
-  bear: {
-    desc: '<b>Bear-skenaario:</b> APT palaa $1 200/mtu tasolle (lähelle 2024 hintoja). Mt Carbine tuottaa nykytasolla, Barruecopardo käynnistyy hitaasti. Konservatiivinen arvostus, laimennus huomioitu.',
-    values: { aptPrice:1200, concRealisation:70, mtCarbine:1000, barruecopardo:1200, recoveryRate:75, c1Cost:170, aisc:250, corpOverhead:14, da:15, sharesOut:5200, netDebt:60, evMultiple:6.0, peMultiple:8.0, audUsd:0.700 }
-  },
-  base: {
-    desc: '<b>Base-skenaario:</b> APT CIF Rotterdam maaliskuun 2026 tasolla (~$2 160/mtu). Mt Carbine ja Barruecopardo tuottavat johdon ohjausalueella. Kaikki parametrit ovat säädettävissä — valitse skenaario lähtöpisteeksi ja hienosäädä slidereillä.',
-    values: { ...DEFAULTS }
-  },
-  bull: {
-    desc: '<b>Bull-skenaario:</b> APT nousee $3 500/mtu tasolle Kiinan vientirajoitusten tiukennusten myötä. Molemmat kaivokset täydellä kapasiteetilla, APT-pilottilaitos nostaa recovery-asteen 90%:iin.',
-    values: { aptPrice:3500, concRealisation:78, mtCarbine:1750, barruecopardo:2000, recoveryRate:90, c1Cost:155, aisc:220, corpOverhead:12, da:18, sharesOut:4800, netDebt:30, evMultiple:10.0, peMultiple:14.0, audUsd:0.700 }
-  },
-  mega: {
-    desc: '<b>Mega-skenaario:</b> APT supercycle $5 000+/mtu. Täysi tuotantokapasiteetti molemmilla kaivoksilla, APT-prosessointi nostaa realisaation 85%:iin. Spekulatiivinen — hintapiikin vaikutusten mallinnus.',
-    values: { aptPrice:5000, concRealisation:85, mtCarbine:2000, barruecopardo:2500, recoveryRate:92, c1Cost:155, aisc:220, corpOverhead:14, da:20, sharesOut:5000, netDebt:20, evMultiple:8.0, peMultiple:12.0, audUsd:0.700 }
-  }
+  bear: { desc:'<b>Bear:</b> APT $1 200, hidas ramp-up, konservatiivinen arvostus.',
+    values:{aptPrice:1200,concRealisation:70,mtCarbine:1000,barruecopardo:1200,recoveryRate:75,c1Cost:170,aisc:250,corpOverhead:14,da:15,sharesOut:5200,netDebt:60,evMultiple:6,peMultiple:8,audUsd:0.700,wacc:14,terminalGrowth:1.5,forecastYears:8,capex:12,nwcPct:6,mcAisc:270,brAisc:230,mcConc:68,brConc:72}},
+  base: { desc:'<b>Base:</b> APT $2 160/mtu (3/2026). Johdon ohjausalue. Säädä slidereillä.',
+    values:{...DEFAULTS}},
+  bull: { desc:'<b>Bull:</b> APT $3 500, täysi kapasiteetti, 90% recovery.',
+    values:{aptPrice:3500,concRealisation:78,mtCarbine:1750,barruecopardo:2000,recoveryRate:90,c1Cost:155,aisc:220,corpOverhead:12,da:18,sharesOut:4800,netDebt:30,evMultiple:10,peMultiple:14,audUsd:0.700,wacc:11,terminalGrowth:2,forecastYears:8,capex:15,nwcPct:5,mcAisc:230,brAisc:210,mcConc:76,brConc:80}},
+  mega: { desc:'<b>Mega:</b> APT $5 000+ supercycle. Spekulatiivinen.',
+    values:{aptPrice:5000,concRealisation:85,mtCarbine:2000,barruecopardo:2500,recoveryRate:92,c1Cost:155,aisc:220,corpOverhead:14,da:20,sharesOut:5000,netDebt:20,evMultiple:8,peMultiple:12,audUsd:0.700,wacc:10,terminalGrowth:2.5,forecastYears:8,capex:18,nwcPct:4,mcAisc:220,brAisc:200,mcConc:80,brConc:85}}
 };
+let V={...DEFAULTS}, SP=0.345, activeScenario='base';
 
-let V = {...DEFAULTS};
-let SP = 0.345;
-let activeScenario = 'base';
-
-// ── SLIDER DEFINITIONS ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// SLIDER DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════════
 const SLIDERS = {
-  price: [
-    { key:'aptPrice',         label:'APT spot-hinta',              min:200,  max:6000, step:25,    unit:'USD/mtu',  sub:'CIF Rotterdam — maaliskuu 2026: ~$2 160/mtu', color:'var(--gold)' },
-    { key:'concRealisation',  label:'Concentraatti-realisaatio',   min:40,   max:95,   step:1,     unit:'%',        sub:'% APT-pariteettiin — EQR myy concentraattia', color:'#a78540' },
+  price:[
+    {key:'aptPrice',label:'APT spot-hinta',min:200,max:6000,step:25,unit:'USD/mtu',sub:'CIF Rotterdam — 3/2026: ~$2 160/mtu',color:'var(--gold)'},
+    {key:'concRealisation',label:'Concentraatti-realisaatio',min:40,max:95,step:1,unit:'%',sub:'% APT-pariteettiin',color:'#a78540'},
   ],
-  prod: [
-    { key:'mtCarbine',        label:'Mt Carbine (Australia)',      min:200,  max:4000, step:50,    unit:'t WO3/a',  sub:'Nyt ~1 200 t/a → johdon tavoite ~1 750 t (2026)', color:'var(--blue)' },
-    { key:'barruecopardo',    label:'Barruecopardo (Espanja)',      min:500,  max:3500, step:50,    unit:'t WO3/a',  sub:'Saloro — kapasiteetti ~1 600 t/a, Traxys-offtake', color:'#38bdf8' },
-    { key:'recoveryRate',     label:'Recovery rate',               min:50,   max:98,   step:1,     unit:'%',        sub:'Nykyinen ~78% → APT-pilottilaitoksella 95%',    color:'#3b82f6' },
+  prod:[
+    {key:'mtCarbine',label:'Mt Carbine (AUS)',min:200,max:4000,step:50,unit:'t WO3/a',sub:'Nyt ~1 200 → tavoite ~1 750 t',color:'var(--blue)'},
+    {key:'barruecopardo',label:'Barruecopardo (ESP)',min:500,max:3500,step:50,unit:'t WO3/a',sub:'Kapasiteetti ~1 600 t/a',color:'#38bdf8'},
+    {key:'recoveryRate',label:'Recovery rate',min:50,max:98,step:1,unit:'%',sub:'Nyt ~78% → APT-laitos 95%',color:'#3b82f6'},
   ],
-  cost: [
-    { key:'c1Cost',           label:'C1 cash cost',                min:80,   max:500,  step:5,     unit:'USD/mtu',  sub:'Suorat tuotantokulut USD/mtu',                  color:'var(--red)' },
-    { key:'aisc',             label:'AISC',                        min:120,  max:600,  step:5,     unit:'USD/mtu',  sub:'All-in sustaining cost USD/mtu',                color:'#ef4444' },
-    { key:'corpOverhead',     label:'Yleiskulut',                  min:5,    max:40,   step:0.5,   unit:'M USD',    sub:'Corporate overhead — kaksi kaivosta',           color:'#dc2626' },
-    { key:'da',               label:'D&A poistot',                 min:5,    max:50,   step:0.5,   unit:'M USD',    sub:'Depreciation & amortisation M USD/a',           color:'#b91c1c' },
+  cost:[
+    {key:'c1Cost',label:'C1 cash cost',min:80,max:500,step:5,unit:'USD/mtu',sub:'Suorat tuotantokulut',color:'var(--red)'},
+    {key:'aisc',label:'AISC',min:120,max:600,step:5,unit:'USD/mtu',sub:'All-in sustaining cost',color:'#ef4444'},
+    {key:'corpOverhead',label:'Yleiskulut',min:5,max:40,step:0.5,unit:'M USD',sub:'Corporate overhead',color:'#dc2626'},
+    {key:'da',label:'D&A poistot',min:5,max:50,step:0.5,unit:'M USD',sub:'Depreciation & amortisation',color:'#b91c1c'},
   ],
-  fin: [
-    { key:'sharesOut',        label:'Osakkeet liikkeessä',         min:1000, max:7000, step:50,    unit:'milj.',    sub:'Nykyinen ~4 800M (maaliskuu 2026)',              color:'var(--green)' },
-    { key:'netDebt',          label:'Netto velka',                 min:0,    max:200,  step:2,     unit:'M USD',    sub:'Velka − kassa M USD',                          color:'#10b981' },
-    { key:'evMultiple',       label:'EV/EBITDA-kerroin',           min:3,    max:20,   step:0.5,   unit:'x',        sub:'Vertaisarvostuskerroin',                         color:'#059669' },
-    { key:'peMultiple',       label:'P/E-kerroin',                 min:5,    max:40,   step:0.5,   unit:'x',        sub:'Osakekurssitavoitteen P/E-pohja',               color:'#047857' },
-    { key:'audUsd',           label:'AUD/USD',                     min:0.55, max:0.80, step:0.005, unit:'kurssi',   sub:'Nyt ~0.700 (maaliskuu 2026)',                    color:'#6ee7b7' },
+  fin:[
+    {key:'sharesOut',label:'Osakkeet',min:1000,max:7000,step:50,unit:'milj.',sub:'~4 800M (3/2026)',color:'var(--green)'},
+    {key:'netDebt',label:'Netto velka',min:0,max:200,step:2,unit:'M USD',sub:'Velka − kassa',color:'#10b981'},
+    {key:'evMultiple',label:'EV/EBITDA',min:3,max:20,step:0.5,unit:'x',sub:'Vertaiskerroin',color:'#059669'},
+    {key:'peMultiple',label:'P/E',min:5,max:40,step:0.5,unit:'x',sub:'P/E-kerroin',color:'#047857'},
+    {key:'audUsd',label:'AUD/USD',min:0.55,max:0.80,step:0.005,unit:'kurssi',sub:'~0.700 (3/2026)',color:'#6ee7b7'},
+  ],
+  dcf:[
+    {key:'wacc',label:'WACC',min:6,max:20,step:0.5,unit:'%',sub:'Painotettu pääomakustannus',color:'var(--cyan)'},
+    {key:'terminalGrowth',label:'Terminaalikasvu',min:0,max:4,step:0.25,unit:'%',sub:'Ikuinen kasvuoletus',color:'#06b6d4'},
+    {key:'capex',label:'Capex',min:2,max:50,step:1,unit:'M USD',sub:'Vuotuiset investoinnit',color:'#0891b2'},
+    {key:'nwcPct',label:'NWC % liikevaihdosta',min:0,max:15,step:0.5,unit:'%',sub:'Käyttöpääoman osuus',color:'#0e7490'},
   ],
 };
 
-// ── FORMATTERS ────────────────────────────────────────────────────────────
-const fi = (n, d=1) => isNaN(n)||!isFinite(n) ? '–' : n.toLocaleString('fi-FI', {minimumFractionDigits:d, maximumFractionDigits:d});
-const fM  = (n, d=1) => '$' + fi(n, d) + 'M';
-const fU  = (n, d=1) => '$' + fi(n, d);
-const fA  = (n, d=3) => 'A$' + fi(n, d);
+// ═══════════════════════════════════════════════════════════════════════════
+// FORMATTERS & HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+const fi=(n,d=1)=>isNaN(n)||!isFinite(n)?'–':n.toLocaleString('fi-FI',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fM=(n,d=1)=>'$'+fi(n,d)+'M';
+const fU=(n,d=1)=>'$'+fi(n,d);
+const fA=(n,d=3)=>'A$'+fi(n,d);
+function fmtSV(v,u){if(u==='USD/mtu')return'$'+Math.round(v);if(u==='%')return v+'%';if(u==='x')return v+'x';if(u==='kurssi')return'A$'+v;if(u==='M USD')return'$'+v+'M';return fi(v,0)+' '+u;}
 
-function fmtSV(val, unit) {
-  if (unit==='USD/mtu') return '$' + Math.round(val);
-  if (unit==='%')       return val + '%';
-  if (unit==='x')       return val + 'x';
-  if (unit==='kurssi')  return 'A$' + val;
-  if (unit==='M USD')   return '$' + val + 'M';
-  return fi(val,0) + ' ' + unit;
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',t.textContent.toLowerCase().includes(id)||
+    (id==='core'&&i===0)||(id==='dcf'&&i===1)||(id==='breakeven'&&i===2)||(id==='peers'&&i===3)||(id==='nav'&&i===4)||(id==='timeline'&&i===5)||(id==='mc'&&i===6)));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tc-'+id).classList.add('active');
+  if(id==='mc') runMonteCarlo();
+}
+// Simple tab switch
+document.addEventListener('click',e=>{
+  if(!e.target.classList.contains('tab'))return;
+  const tabs=['core','dcf','breakeven','peers','nav','timeline','mc'];
+  const idx=[...document.querySelectorAll('.tab')].indexOf(e.target);
+  if(idx>=0&&idx<tabs.length){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    e.target.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById('tc-'+tabs[idx]).classList.add('active');
+    if(tabs[idx]==='mc')runMonteCarlo();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CORE CALC
+// ═══════════════════════════════════════════════════════════════════════════
+function calc(p){
+  const t=p.mtCarbine+p.barruecopardo, rp=p.aptPrice*(p.concRealisation/100);
+  const grossRev=(rp*t*100/1e6)*(p.recoveryRate/100);
+  const aiscTotal=p.aisc*t*100/1e6, grossProfit=grossRev-aiscTotal;
+  const ebitda=grossProfit-p.corpOverhead, ebit=ebitda-p.da;
+  const tax=ebit>0?ebit*0.30:0, ni=ebit-tax, eps=ni/p.sharesOut, epsAUD=eps/p.audUsd;
+  const ebitdaMargin=grossRev>0?ebitda/grossRev*100:0, netMargin=grossRev>0?ni/grossRev*100:0;
+  const cashMargin=grossRev>0?grossProfit/grossRev*100:0, spread=p.aptPrice-p.aisc;
+  const ev=ebitda*p.evMultiple, equity=ev-p.netDebt;
+  const navUSD=equity/p.sharesOut, navAUD=navUSD/p.audUsd;
+  const peAUD=Math.max(eps,0)*p.peMultiple/p.audUsd, avgAUD=(navAUD+peAUD)/2;
+  // FCF for DCF
+  const fcf=ebitda-tax-p.capex-(grossRev*p.nwcPct/100);
+  return{totalWO3:t,grossRev,aiscTotal,grossProfit,ebitda,ebit,tax,ni,eps,epsAUD,ebitdaMargin,netMargin,cashMargin,spread,ev,equity,navUSD,navAUD,peAUD,avgAUD,fcf};
 }
 
-// ── CALCULATE ─────────────────────────────────────────────────────────────
-function calc(p) {
-  const totalWO3    = p.mtCarbine + p.barruecopardo;
-  const realPrice   = p.aptPrice * (p.concRealisation / 100);
-  const grossRev    = (realPrice * totalWO3 * 100 / 1e6) * (p.recoveryRate / 100);
-  const aiscTotal   = p.aisc * totalWO3 * 100 / 1e6;
-  const grossProfit = grossRev - aiscTotal;
-  const ebitda      = grossProfit - p.corpOverhead;
-  const ebit        = ebitda - p.da;
-  const tax         = ebit > 0 ? ebit * 0.30 : 0;
-  const ni          = ebit - tax;
-  const eps         = ni / p.sharesOut;
-  const epsAUD      = eps / p.audUsd;
-  const ebitdaMargin= grossRev > 0 ? ebitda / grossRev * 100 : 0;
-  const netMargin   = grossRev > 0 ? ni / grossRev * 100 : 0;
-  const cashMargin  = grossRev > 0 ? grossProfit / grossRev * 100 : 0;
-  const spread      = p.aptPrice - p.aisc;
-
-  const ev       = ebitda * p.evMultiple;
-  const equity   = ev - p.netDebt;
-  const navUSD   = equity / p.sharesOut;
-  const navAUD   = navUSD / p.audUsd;
-  const peAUD    = Math.max(eps, 0) * p.peMultiple / p.audUsd;
-  const avgAUD   = (navAUD + peAUD) / 2;
-
-  return { totalWO3, grossRev, aiscTotal, grossProfit, ebitda, ebit, tax, ni,
-           eps, epsAUD, ebitdaMargin, netMargin, cashMargin, spread,
-           ev, equity, navUSD, navAUD, peAUD, avgAUD };
+// ═══════════════════════════════════════════════════════════════════════════
+// DCF CALCULATION
+// ═══════════════════════════════════════════════════════════════════════════
+function calcDCF(p){
+  const r=calc(p), wacc=p.wacc/100, g=p.terminalGrowth/100;
+  const years=p.forecastYears;
+  let pvFCF=0, fcfs=[];
+  for(let y=1;y<=years;y++){
+    const growth=y<=2?1.05:y<=4?1.02:1.0; // ramp-up then stable
+    const yFCF=r.fcf*Math.pow(growth,y-1);
+    const pv=yFCF/Math.pow(1+wacc,y);
+    pvFCF+=pv;
+    fcfs.push({year:2025+y,fcf:yFCF,pv});
+  }
+  const termFCF=fcfs[fcfs.length-1].fcf*(1+g);
+  const tv=termFCF/(wacc-g);
+  const pvTV=tv/Math.pow(1+wacc,years);
+  const ev=pvFCF+pvTV;
+  const eqValue=ev-p.netDebt;
+  const perShareUSD=eqValue/p.sharesOut;
+  const perShareAUD=perShareUSD/p.audUsd;
+  return{fcfs,pvFCF,tv,pvTV,ev,eqValue,perShareUSD,perShareAUD,termFCF};
 }
 
-// ── SCENARIO MANAGEMENT ──────────────────────────────────────────────────
-function loadScenario(key) {
-  const sc = SCENARIOS[key];
-  if (!sc) return;
-  activeScenario = key;
-  V = {...sc.values};
-  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('sc-' + key).classList.add('active');
-  document.getElementById('sc-desc').innerHTML = sc.desc;
-  rebuildAll();
-  render();
+// ═══════════════════════════════════════════════════════════════════════════
+// SCENARIO & SLIDER MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+function loadScenario(key){
+  const sc=SCENARIOS[key]; if(!sc)return;
+  activeScenario=key; V={...sc.values};
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sc-'+key).classList.add('active');
+  document.getElementById('sc-desc').innerHTML=sc.desc;
+  rebuildAll(); render();
 }
-
-function markCustom() {
-  if (activeScenario !== 'custom') {
-    activeScenario = 'custom';
-    document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('sc-desc').innerHTML = '<b>Omat asetukset:</b> Olet muokannut parametreja käsin. Valitse skenaario palauttaaksesi esiasetetut arvot.';
+function markCustom(){
+  if(activeScenario!=='custom'){
+    activeScenario='custom';
+    document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sc-desc').innerHTML='<b>Omat asetukset</b> — muokattu käsin.';
   }
 }
-
-// ── SLIDER BUILD ──────────────────────────────────────────────────────────
-function buildSliders(group, containerId) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  SLIDERS[group].forEach(cfg => {
-    const pct = ((V[cfg.key] - cfg.min) / (cfg.max - cfg.min)) * 100;
-    const row = document.createElement('div');
-    row.className = 'slider-row';
-    row.innerHTML = `
-      <div class="slider-header">
-        <span class="slider-label">${cfg.label}</span>
-        <span class="slider-value" id="sv-${cfg.key}" style="color:${cfg.color}">${fmtSV(V[cfg.key], cfg.unit)}</span>
-      </div>
+function buildSliders(group,containerId){
+  const el=document.getElementById(containerId); el.innerHTML='';
+  SLIDERS[group].forEach(cfg=>{
+    const pct=((V[cfg.key]-cfg.min)/(cfg.max-cfg.min))*100;
+    const row=document.createElement('div'); row.className='slider-row';
+    row.innerHTML=`<div class="slider-header"><span class="slider-label">${cfg.label}</span><span class="slider-value" id="sv-${cfg.key}" style="color:${cfg.color}">${fmtSV(V[cfg.key],cfg.unit)}</span></div>
       <div class="slider-sub">${cfg.sub}</div>
-      <div class="track" id="tr-${cfg.key}">
-        <div class="track-fill" id="tf-${cfg.key}" style="width:${pct}%;background:linear-gradient(90deg,${cfg.color}55,${cfg.color})"></div>
-        <div class="track-thumb" id="tt-${cfg.key}" style="left:${pct}%;color:${cfg.color};background:${cfg.color}"></div>
-        <input type="range" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${V[cfg.key]}"
-          oninput="onSlider('${cfg.key}','${cfg.unit}',${cfg.min},${cfg.max},this.value)">
-      </div>
+      <div class="track"><div class="track-fill" id="tf-${cfg.key}" style="width:${pct}%;background:linear-gradient(90deg,${cfg.color}55,${cfg.color})"></div><div class="track-thumb" id="tt-${cfg.key}" style="left:${pct}%;color:${cfg.color};background:${cfg.color}"></div><input type="range" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${V[cfg.key]}" oninput="onSlider('${cfg.key}','${cfg.unit}',${cfg.min},${cfg.max},this.value)"></div>
       <div class="slim"><span>${fmtSV(cfg.min,cfg.unit)}</span><span>${fmtSV(cfg.max,cfg.unit)}</span></div>`;
     el.appendChild(row);
   });
 }
-
-function rebuildAll() {
-  buildSliders('price','sl-price');
-  buildSliders('prod', 'sl-prod');
-  buildSliders('cost', 'sl-cost');
-  buildSliders('fin',  'sl-fin');
+function rebuildAll(){['price','prod','cost','fin','dcf'].forEach(g=>buildSliders(g,'sl-'+g));}
+function onSlider(key,unit,min,max,raw){
+  const val=parseFloat(raw); V[key]=val;
+  const pct=((val-min)/(max-min))*100;
+  document.getElementById('sv-'+key).textContent=fmtSV(val,unit);
+  document.getElementById('tf-'+key).style.width=pct+'%';
+  document.getElementById('tt-'+key).style.left=pct+'%';
+  markCustom(); render();
 }
+function kpi(l,v,s,c,big){return`<div class="kpi" style="--kpi-color:${c}"><div class="kpi-label">${l}</div><div class="kpi-val ${big?'big':'med'}">${v}</div><div class="kpi-sub">${s}</div></div>`;}
 
-function onSlider(key, unit, min, max, raw) {
-  const val = parseFloat(raw);
-  V[key] = val;
-  const pct = ((val - min) / (max - min)) * 100;
-  document.getElementById('sv-'+key).textContent = fmtSV(val, unit);
-  document.getElementById('tf-'+key).style.width = pct + '%';
-  document.getElementById('tt-'+key).style.left  = pct + '%';
-  markCustom();
-  render();
-}
+function onSP(){const val=parseFloat(document.getElementById('sp-input').value);if(!isNaN(val)&&val>0){SP=val;render();}}
 
-// ── KPI HELPER ────────────────────────────────────────────────────────────
-function kpi(label, val, sub, color, big) {
-  return `<div class="kpi" style="--kpi-color:${color}">
-    <div class="kpi-label">${label}</div>
-    <div class="kpi-val ${big?'big':'med'}">${val}</div>
-    <div class="kpi-sub">${sub}</div>
-  </div>`;
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// MONTE CARLO
+// ═══════════════════════════════════════════════════════════════════════════
+function runMonteCarlo(){
+  const N=5000, results=[];
+  const rng=()=>Math.random()+Math.random()+Math.random()-1.5; // approx normal
+  for(let i=0;i<N;i++){
+    const p={...V};
+    p.aptPrice=V.aptPrice*Math.exp(rng()*0.4);
+    p.mtCarbine=Math.max(200,V.mtCarbine*(1+rng()*0.25));
+    p.barruecopardo=Math.max(500,V.barruecopardo*(1+rng()*0.25));
+    p.recoveryRate=Math.min(98,Math.max(50,V.recoveryRate*(1+rng()*0.10)));
+    p.aisc=Math.max(120,V.aisc*(1+rng()*0.20));
+    const r=calc(p);
+    const dcf=calcDCF(p);
+    const avgTarget=(r.avgAUD+dcf.perShareAUD)/2;
+    results.push(avgTarget);
+  }
+  results.sort((a,b)=>a-b);
+  const p10=results[Math.floor(N*0.10)], p25=results[Math.floor(N*0.25)];
+  const p50=results[Math.floor(N*0.50)], p75=results[Math.floor(N*0.75)];
+  const p90=results[Math.floor(N*0.90)];
+  const mean=results.reduce((a,b)=>a+b,0)/N;
+  const pAbove=results.filter(v=>v>SP).length/N*100;
 
-// ── STOCK PANEL ───────────────────────────────────────────────────────────
-function renderStockPanel(r) {
-  const sp  = SP;
-  const mcAUD = sp * V.sharesOut;
-  const mcUSD = mcAUD * V.audUsd;
-
-  const col = v => v >= 0 ? 'var(--green)' : 'var(--red)';
-  const pct = v => (v >= 0 ? '+' : '') + fi(v,1) + '%';
-
-  const uEV  = r.navAUD > 0 && sp > 0 ? (r.navAUD  - sp) / sp * 100 : 0;
-  const uPE  = r.peAUD  > 0 && sp > 0 ? (r.peAUD   - sp) / sp * 100 : 0;
-  const uAvg = r.avgAUD > 0 && sp > 0 ? (r.avgAUD  - sp) / sp * 100 : 0;
-
-  document.getElementById('sp-mktcap').textContent     = 'A$' + fi(mcAUD,0) + 'M';
-  document.getElementById('sp-mktcap-usd').textContent = '≈ US$' + fi(mcUSD,0) + 'M';
-
-  document.getElementById('sp-ev').textContent  = pct(uEV);
-  document.getElementById('sp-ev').style.color  = col(uEV);
-  document.getElementById('sp-ev-tgt').textContent = 'Tavoite ' + fA(r.navAUD);
-
-  document.getElementById('sp-pe').textContent  = pct(uPE);
-  document.getElementById('sp-pe').style.color  = col(uPE);
-  document.getElementById('sp-pe-tgt').textContent = 'Tavoite ' + fA(r.peAUD);
-
-  document.getElementById('sp-avg').textContent  = pct(uAvg);
-  document.getElementById('sp-avg').style.color  = col(uAvg);
-  document.getElementById('sp-avg-tgt').textContent = 'Tavoite ' + fA(r.avgAUD);
-
-  const wkLow=0.028, wkHigh=0.390;
-  const wPct = Math.max(0, Math.min(100, (sp-wkLow)/(wkHigh-wkLow)*100));
-  document.getElementById('sp-bar-fill').style.width = wPct + '%';
-  document.getElementById('sp-bar-dot').style.left   = wPct + '%';
-}
-
-function onSP() {
-  const val = parseFloat(document.getElementById('sp-input').value);
-  if (!isNaN(val) && val > 0) { SP = val; render(); }
-}
-
-// ── MAIN RENDER ───────────────────────────────────────────────────────────
-function render() {
-  const r   = calc(V);
-  const pos = v => v > 0 ? 'var(--green)' : 'var(--red)';
-
-  const total = V.mtCarbine + V.barruecopardo;
-  const scLabel = total < 2500 ? '⚠ Alle johdon ohjauksen (3–4 kt)' :
-                  total < 3000 ? '📍 Johdon ohjauksen alaraja' :
-                  total < 4000 ? '✅ Johdon ohjausalue 3–4 kt' :
-                  total < 5500 ? '🚀 Tuplausskenaario' : '🔭 Bulliskenaario';
-
-  // KPI TOP ROW
-  document.getElementById('kpi-top').innerHTML =
-    kpi('Liikevaihto', fM(r.grossRev), 'M USD / vuosi', 'var(--gold)', true) +
-    kpi('EBITDA', fM(r.ebitda), 'Marginaali ' + fi(r.ebitdaMargin,1) + '%', pos(r.ebitda), true) +
-    kpi('Nettotulos', fM(r.ni), 'Vero 30%', pos(r.ni), true);
-
-  // KPI BOT ROW
-  document.getElementById('kpi-bot').innerHTML =
-    kpi('Kokonaistuotanto', fi(total,0) + ' t WO3', scLabel, total >= 3000 ? 'var(--green)' : '#f59e0b') +
-    kpi('EPS (USD)', fU(r.eps,3), 'A$' + fi(r.epsAUD,3), 'var(--purple)') +
-    kpi('EV/EBITDA Nav', fA(r.navAUD), 'A$ / osake', 'var(--blue)') +
-    kpi('Avg. tavoite', fA(r.avgAUD), 'Painotettu tavoitekurssi', 'var(--gold)');
-
-  // INCOME STATEMENT
-  const mcRev = r.grossRev * (V.mtCarbine / total);
-  const brRev = r.grossRev * (V.barruecopardo / total);
-  const irows = [
-    ['Mt Carbine (' + fi(V.mtCarbine,0) + ' t WO3/a)', mcRev, false, false, null],
-    ['Barruecopardo (' + fi(V.barruecopardo,0) + ' t WO3/a)', brRev, false, false, null],
-    ['Liikevaihto yhteensä', r.grossRev, true, false, 'var(--gold)'],
-    ['AISC-kustannukset', -r.aiscTotal, false, true, null],
-    ['Bruttokate', r.grossProfit, true, false, pos(r.grossProfit)],
-    ['Yhtiön yleiskulut', -V.corpOverhead, false, true, null],
-    ['EBITDA', r.ebitda, true, false, pos(r.ebitda)],
-    ['D&A poistot', -V.da, false, true, null],
-    ['EBIT', r.ebit, true, false, null],
-    ['Vero (30%)', -r.tax, false, true, null],
-    ['Nettotulos', r.ni, true, false, pos(r.ni)],
-    ['EPS (USD/osake)', null, true, false, 'var(--purple)', r.eps],
-  ];
-  document.getElementById('income').innerHTML = irows.map(([lbl,val,bold,ind,col,epsVal])=>{
-    const displayVal = epsVal !== undefined ? fU(epsVal,3)+'/osake' : fi(val,2);
-    const color = col || (val !== null && val < 0 ? 'var(--red)' : 'var(--text)');
-    return `<div class="irow${bold?' bold':''}${ind?' ind':''}">
-      <span class="il">${lbl}</span>
-      <span class="iv" style="color:${color}">${displayVal}</span>
+  document.getElementById('mc-stats').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+      ${kpi('Mediaani (P50)',fA(p50),'50% todennäköisyys','var(--gold)',false)}
+      ${kpi('Keskiarvo',fA(mean),'5 000 ajoa','var(--cyan)',false)}
+      ${kpi('Yli A$'+fi(SP,3),fi(pAbove,0)+'%','Todennäk. nousua','var(--green)',false)}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+      ${[['P10',p10,'var(--red)'],['P25',p25,'var(--orange)'],['P50',p50,'var(--gold)'],['P75',p75,'var(--green)'],['P90',p90,'var(--cyan)']].map(([l,v,c])=>`<div style="text-align:center;"><div style="font-size:9px;color:var(--text-muted);">${l}</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${c};">${fA(v)}</div></div>`).join('')}
     </div>`;
+
+  // Draw histogram
+  const canvas=document.getElementById('mc-canvas');
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr; canvas.height=220*dpr;
+  ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth, H=220;
+  ctx.clearRect(0,0,W,H);
+
+  const minV=Math.max(results[0],-0.5), maxV=results[N-1];
+  const bins=60, binW=(maxV-minV)/bins, counts=new Array(bins).fill(0);
+  results.forEach(v=>{const b=Math.min(bins-1,Math.floor((v-minV)/binW));counts[b]++;});
+  const maxC=Math.max(...counts);
+
+  const pad={l:40,r:10,t:10,b:25}, cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  // Bars
+  counts.forEach((c,i)=>{
+    const x=pad.l+(i/bins)*cw, w=cw/bins-1;
+    const h=(c/maxC)*ch, y=pad.t+ch-h;
+    const val=minV+(i+0.5)*binW;
+    ctx.fillStyle=val<SP?'rgba(248,113,113,0.5)':val<p50?'rgba(200,169,110,0.5)':'rgba(52,211,153,0.5)';
+    ctx.fillRect(x,y,Math.max(w,1),h);
+  });
+  // SP line
+  const spX=pad.l+((SP-minV)/(maxV-minV))*cw;
+  ctx.strokeStyle='#f87171'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(spX,pad.t); ctx.lineTo(spX,pad.t+ch); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#f87171'; ctx.font='9px IBM Plex Mono'; ctx.fillText('Kurssi',spX+3,pad.t+12);
+  // P50 line
+  const p50X=pad.l+((p50-minV)/(maxV-minV))*cw;
+  ctx.strokeStyle='var(--gold)'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(p50X,pad.t); ctx.lineTo(p50X,pad.t+ch); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#c8a96e'; ctx.fillText('P50',p50X+3,pad.t+24);
+  // X-axis labels
+  ctx.fillStyle='#4b5563'; ctx.font='9px IBM Plex Mono';
+  for(let i=0;i<=4;i++){
+    const v=minV+(maxV-minV)*(i/4);
+    const x=pad.l+(i/4)*cw;
+    ctx.fillText('A$'+fi(v,2),x,H-5);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function render(){
+  const r=calc(V), dcf=calcDCF(V);
+  const pos=v=>v>0?'var(--green)':'var(--red)';
+  const total=V.mtCarbine+V.barruecopardo;
+  const scLabel=total<2500?'⚠ Alle 3kt':total<3000?'📍 Alaraja':total<4000?'✅ 3–4 kt':total<5500?'🚀 Tuplaus':'🔭 Bull';
+
+  // KPIs
+  document.getElementById('kpi-top').innerHTML=
+    kpi('Liikevaihto',fM(r.grossRev),'M USD / vuosi','var(--gold)',true)+
+    kpi('EBITDA',fM(r.ebitda),'Marginaali '+fi(r.ebitdaMargin,1)+'%',pos(r.ebitda),true)+
+    kpi('Nettotulos',fM(r.ni),'Vero 30%',pos(r.ni),true);
+  document.getElementById('kpi-bot').innerHTML=
+    kpi('Tuotanto',fi(total,0)+' t',scLabel,total>=3000?'var(--green)':'#f59e0b')+
+    kpi('EPS',fU(r.eps,3),'A$'+fi(r.epsAUD,3),'var(--purple)')+
+    kpi('DCF/osake',fA(dcf.perShareAUD),'WACC '+V.wacc+'%','var(--cyan)')+
+    kpi('Avg. tavoite',fA((r.avgAUD+dcf.perShareAUD)/2),'EV/EBITDA + P/E + DCF','var(--gold)');
+
+  // Stock panel
+  const sp=SP, mcAUD=sp*V.sharesOut, mcUSD=mcAUD*V.audUsd;
+  const col=v=>v>=0?'var(--green)':'var(--red)', pctF=v=>(v>=0?'+':'')+fi(v,1)+'%';
+  const uEV=r.navAUD>0&&sp>0?(r.navAUD-sp)/sp*100:0;
+  const uDCF=dcf.perShareAUD>0&&sp>0?(dcf.perShareAUD-sp)/sp*100:0;
+  const avgAll=(r.avgAUD+dcf.perShareAUD)/2;
+  const uAvg=avgAll>0&&sp>0?(avgAll-sp)/sp*100:0;
+  document.getElementById('sp-mktcap').textContent='A$'+fi(mcAUD,0)+'M';
+  document.getElementById('sp-mktcap-usd').textContent='≈ US$'+fi(mcUSD,0)+'M';
+  document.getElementById('sp-ev').textContent=pctF(uEV); document.getElementById('sp-ev').style.color=col(uEV);
+  document.getElementById('sp-ev-tgt').textContent='Tavoite '+fA(r.navAUD);
+  document.getElementById('sp-dcf').textContent=pctF(uDCF); document.getElementById('sp-dcf').style.color=col(uDCF);
+  document.getElementById('sp-dcf-tgt').textContent='DCF '+fA(dcf.perShareAUD);
+  document.getElementById('sp-avg').textContent=pctF(uAvg); document.getElementById('sp-avg').style.color=col(uAvg);
+  document.getElementById('sp-avg-tgt').textContent='Tavoite '+fA(avgAll);
+  const wkLow=0.028,wkHigh=0.390,wPct=Math.max(0,Math.min(100,(sp-wkLow)/(wkHigh-wkLow)*100));
+  document.getElementById('sp-bar-fill').style.width=wPct+'%';
+  document.getElementById('sp-bar-dot').style.left=wPct+'%';
+
+  // ── CORE TAB ──
+  const mcRev=r.grossRev*(V.mtCarbine/total), brRev=r.grossRev*(V.barruecopardo/total);
+  const irows=[
+    ['Mt Carbine ('+fi(V.mtCarbine,0)+' t)',mcRev,0,0,null],['Barruecopardo ('+fi(V.barruecopardo,0)+' t)',brRev,0,0,null],
+    ['Liikevaihto yhteensä',r.grossRev,1,0,'var(--gold)'],['AISC-kustannukset',-r.aiscTotal,0,1,null],
+    ['Bruttokate',r.grossProfit,1,0,pos(r.grossProfit)],['Yleiskulut',-V.corpOverhead,0,1,null],
+    ['EBITDA',r.ebitda,1,0,pos(r.ebitda)],['D&A',-V.da,0,1,null],['EBIT',r.ebit,1,0,null],
+    ['Vero (30%)',-r.tax,0,1,null],['Nettotulos',r.ni,1,0,pos(r.ni)],
+  ];
+  document.getElementById('income').innerHTML=irows.map(([l,v,b,i,c])=>{
+    const color=c||(v<0?'var(--red)':'var(--text)');
+    return`<div class="irow${b?' bold':''}${i?' ind':''}"><span class="il">${l}</span><span class="iv" style="color:${color}">${fi(v,2)}</span></div>`;
   }).join('');
 
-  // MARGINS
-  document.getElementById('margins').innerHTML = [
-    ['Bruttokate-marginaali', r.cashMargin, 'var(--gold)'],
-    ['EBITDA-marginaali', r.ebitdaMargin, 'var(--green)'],
-    ['Netto-marginaali', r.netMargin, 'var(--purple)'],
-  ].map(([n,p,c])=>`<div class="mrow">
-    <div class="mhdr"><span class="mname">${n}</span><span class="mpct" style="color:${c}">${fi(p,1)}%</span></div>
-    <div class="btrack"><div class="bfill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></div></div>
-  </div>`).join('') +
-  `<div class="mrow"><div class="mhdr">
-    <span class="mname">APT spread (hinta − AISC)</span>
-    <span class="mpct" style="color:${r.spread>=0?'var(--green)':'var(--red)'}">$${fi(r.spread,0)}/mtu</span>
-  </div></div>`;
+  document.getElementById('margins').innerHTML=[
+    ['Bruttokate',r.cashMargin,'var(--gold)'],['EBITDA',r.ebitdaMargin,'var(--green)'],['Netto',r.netMargin,'var(--purple)'],
+  ].map(([n,p,c])=>`<div class="mrow"><div class="mhdr"><span class="mname">${n}-marginaali</span><span class="mpct" style="color:${c}">${fi(p,1)}%</span></div><div class="btrack"><div class="bfill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></div></div></div>`).join('')+
+  `<div class="mrow"><div class="mhdr"><span class="mname">APT spread</span><span class="mpct" style="color:${r.spread>=0?'var(--green)':'var(--red)'}">$${fi(r.spread,0)}/mtu</span></div></div>`;
 
-  // SENSITIVITY TABLE
-  const aptPs = [...new Set([500,1000,1500,2000,V.aptPrice,2500,3000,4000,5000].map(Math.round))].sort((a,b)=>b-a);
-  const totals = [1500, 2500, 3000, 3500, 5000];
-  document.getElementById('senswrap').innerHTML = (() => {
-    let h = `<table class="stbl"><thead><tr><th>Hinta ↓ / WO3 →</th>${totals.map(q=>`<th>${q}t</th>`).join('')}</tr></thead><tbody>`;
-    aptPs.forEach(p => {
-      h += `<tr><td>$${p}</td>`;
-      totals.forEach(q => {
-        const grev = (p*(V.concRealisation/100)*q*100/1e6)*(V.recoveryRate/100);
-        const ebt  = grev - (V.aisc*q*100/1e6) - V.corpOverhead - V.da;
-        const ep   = (ebt > 0 ? ebt*0.70 : ebt) / V.sharesOut;
-        const isB  = Math.abs(p - V.aptPrice) < 13 && Math.abs(q - total) < 200;
-        const good = ep > r.eps * 1.05;
-        const bad  = ep < r.eps * 0.5;
-        const st   = isB ? 'background:var(--gold);color:#111;font-weight:700;border-radius:3px;' :
-                     good ? 'color:var(--green);' : bad ? 'color:var(--red);' : 'color:var(--text-dim);';
-        h += `<td style="${st}">${fi(ep,3)}</td>`;
-      });
-      h += '</tr>';
-    });
-    return h + '</tbody></table>';
-  })();
+  // Sensitivity
+  const aptPs=[...new Set([500,1000,1500,2000,V.aptPrice,2500,3000,4000,5000].map(Math.round))].sort((a,b)=>b-a);
+  const totals=[1500,2500,3000,3500,5000];
+  let h=`<table class="stbl"><thead><tr><th>APT ↓ / WO3 →</th>${totals.map(q=>`<th>${q}t</th>`).join('')}</tr></thead><tbody>`;
+  aptPs.forEach(p=>{h+=`<tr><td>$${p}</td>`;totals.forEach(q=>{
+    const grev=(p*(V.concRealisation/100)*q*100/1e6)*(V.recoveryRate/100);
+    const ebt=grev-(V.aisc*q*100/1e6)-V.corpOverhead-V.da;
+    const ep=(ebt>0?ebt*0.70:ebt)/V.sharesOut;
+    const isB=Math.abs(p-V.aptPrice)<13&&Math.abs(q-total)<200;
+    const st=isB?'background:var(--gold);color:#111;font-weight:700;border-radius:3px;':ep>r.eps*1.05?'color:var(--green);':ep<r.eps*0.5?'color:var(--red);':'color:var(--text-dim);';
+    h+=`<td style="${st}">${fi(ep,3)}</td>`;});h+='</tr>';});
+  document.getElementById('senswrap').innerHTML=h+'</tbody></table>';
 
-  // VALUATION BRIDGE
-  const brows = [
-    [`EBITDA $${fi(r.ebitda,1)}M × ${V.evMultiple}x = EV`, fM(r.ev), false, 'var(--blue)'],
-    ['− Netto velka', fM(-V.netDebt), false, 'var(--red)'],
-    ['= Oman pääoman arvo (M USD)', fM(r.equity), true, 'var(--gold)'],
-    ['÷ ' + fi(V.sharesOut,0) + 'M osaketta → USD/osake', fU(r.navUSD,3), false, 'var(--gold)'],
-    ['EV/EBITDA-kurssi (A$/osake)', fA(r.navAUD), true, 'var(--gold)'],
-    ['P/E ' + V.peMultiple + 'x × EPS → kurssi (A$/osake)', fA(r.peAUD), true, 'var(--purple)'],
-    ['Avg. tavoitekurssi (A$/osake)', fA(r.avgAUD), true, 'var(--green)'],
+  // Valuation bridge
+  document.getElementById('bridge').innerHTML=[
+    [`EBITDA $${fi(r.ebitda,1)}M × ${V.evMultiple}x = EV`,fM(r.ev),0,'var(--blue)'],
+    ['− Netto velka',fM(-V.netDebt),0,'var(--red)'],
+    ['= Equity (M USD)',fM(r.equity),1,'var(--gold)'],
+    ['EV/EBITDA → A$/osake',fA(r.navAUD),1,'var(--gold)'],
+    [`P/E ${V.peMultiple}x → A$/osake`,fA(r.peAUD),1,'var(--purple)'],
+    ['DCF → A$/osake',fA(dcf.perShareAUD),1,'var(--cyan)'],
+    ['Avg. tavoite (3 mallia)',fA(avgAll),1,'var(--green)'],
+  ].map(([l,v,b,c])=>`<div class="brow${b?' bold':''}"><span class="bl">${l}</span><span class="bv" style="color:${c}">${v}</span></div>`).join('');
+
+  // ── DCF TAB ──
+  let dcfH='<div style="margin-bottom:14px;">';
+  dcfH+=`<table class="stbl"><thead><tr><th>Vuosi</th><th>FCF (M$)</th><th>PV (M$)</th></tr></thead><tbody>`;
+  dcf.fcfs.forEach(f=>{dcfH+=`<tr><td>${f.year}</td><td>${fi(f.fcf,1)}</td><td>${fi(f.pv,1)}</td></tr>`;});
+  dcfH+='</tbody></table></div>';
+  dcfH+=`<div class="irow bold"><span class="il">PV kassavirroista</span><span class="iv" style="color:var(--cyan)">${fM(dcf.pvFCF)}</span></div>`;
+  dcfH+=`<div class="irow"><span class="il">Terminaaliarvo (PV)</span><span class="iv">${fM(dcf.pvTV)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">Enterprise Value</span><span class="iv" style="color:var(--gold)">${fM(dcf.ev)}</span></div>`;
+  dcfH+=`<div class="irow"><span class="il">− Netto velka</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">Equity Value</span><span class="iv" style="color:var(--green)">${fM(dcf.eqValue)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">DCF / osake (A$)</span><span class="iv" style="color:var(--cyan);font-size:16px;">${fA(dcf.perShareAUD)}</span></div>`;
+  dcfH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">TV osuus EV:stä: ${fi(dcf.pvTV/dcf.ev*100,0)}% | WACC ${V.wacc}% | g ${V.terminalGrowth}%</div>`;
+  document.getElementById('dcf-detail').innerHTML=dcfH;
+
+  // DCF sensitivity
+  const waccs=[8,10,12,14,16], tgs=[0,1,2,3];
+  let dsH=`<table class="stbl"><thead><tr><th>WACC ↓ / g →</th>${tgs.map(g=>`<th>${g}%</th>`).join('')}</tr></thead><tbody>`;
+  waccs.forEach(w=>{dsH+=`<tr><td>${w}%</td>`;tgs.forEach(g=>{
+    const tp={...V,wacc:w,terminalGrowth:g}; const d=calcDCF(tp);
+    const isB=Math.abs(w-V.wacc)<0.5&&Math.abs(g-V.terminalGrowth)<0.25;
+    const st=isB?'background:var(--gold);color:#111;font-weight:700;border-radius:3px;':d.perShareAUD>dcf.perShareAUD*1.1?'color:var(--green);':d.perShareAUD<dcf.perShareAUD*0.5?'color:var(--red);':'';
+    dsH+=`<td style="${st}">${fA(d.perShareAUD)}</td>`;});dsH+='</tr>';});
+  document.getElementById('dcf-sens').innerHTML=dsH+'</tbody></table>';
+
+  // ── BREAKEVEN TAB ──
+  const mcBE=V.mcAisc/(V.mcConc/100)/(V.recoveryRate/100);
+  const brBE=V.brAisc/(V.brConc/100)/(V.recoveryRate/100);
+  const totalCostM=V.aisc*total*100/1e6+V.corpOverhead+V.da;
+  const revPerAPT=(V.concRealisation/100)*total*100/1e6*(V.recoveryRate/100);
+  const fullBE=totalCostM/revPerAPT;
+  let beH=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+    ${kpi('Mt Carbine BE','$'+fi(mcBE,0)+'/mtu','APT hinta jossa nolla','var(--blue)',false)}
+    ${kpi('Barruecopardo BE','$'+fi(brBE,0)+'/mtu','APT hinta jossa nolla','#38bdf8',false)}
+    ${kpi('Koko yhtiö BE','$'+fi(fullBE,0)+'/mtu','Sis. overhead + D&A','var(--gold)',false)}
+  </div>`;
+  // Visual bar
+  const beMax=Math.max(V.aptPrice*1.2,fullBE*1.3,3000);
+  const barPct=v=>Math.min(100,v/beMax*100);
+  beH+='<div style="margin-bottom:16px;">';
+  [[`Mt Carbine AISC: $${V.mcAisc}/mtu`,mcBE,'var(--blue)'],[`Barruecopardo AISC: $${V.brAisc}/mtu`,brBE,'#38bdf8'],['Yhtiö kokonais-BE',fullBE,'var(--gold)'],['APT spot-hinta',V.aptPrice,'var(--green)']].forEach(([l,v,c])=>{
+    beH+=`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:3px;"><span>${l}</span><span style="color:${c};font-family:var(--mono);font-weight:700;">$${fi(v,0)}/mtu</span></div>
+    <div class="btrack"><div class="bfill" style="width:${barPct(v)}%;background:${c};"></div></div></div>`;
+  });
+  beH+='</div>';
+  beH+=`<div style="font-size:10px;color:var(--text-dim);line-height:1.6;">
+    <b>Turvamarginaali:</b> APT-hinta ($${fi(V.aptPrice,0)}) on <span style="color:var(--green);font-weight:700;">${fi((V.aptPrice-fullBE)/fullBE*100,0)}%</span> yli kokonais-breakeven-tason.<br>
+    Mt Carbine on kannattava kun APT > $${fi(mcBE,0)}/mtu | Barruecopardo kun APT > $${fi(brBE,0)}/mtu
+  </div>`;
+  document.getElementById('breakeven-detail').innerHTML=beH;
+
+  // ── PEERS TAB ──
+  const peers=[
+    {name:'Almonty (AII.TO / ALM)',evEbitda:'–*',ps:'169x',mktcap:'C$6,5B / $4,2B',status:'Sangdong (Korea) ramp-up, Panasqueira (Portugal), Gentung (USA)',note:'Lähin vertailukohta'},
+    {name:'American Tungsten (TUNGF)',evEbitda:'–',ps:'–',mktcap:'Pre-revenue',status:'Lost Creek (USA) exploraatio',note:'Spekulatiivinen'},
+    {name:'China Molybdenum (CMOC)',evEbitda:'~8x',ps:'~2x',mktcap:'~$18B',status:'Diversifioitu (W, Mo, Co, Cu)',note:'Kiina-vertailu'},
+    {name:'Wolf Minerals',evEbitda:'–',ps:'–',mktcap:'Konkurssi 2018',status:'Drakelands (UK) suljettu',note:'Varoittava esimerkki'},
+    {name:'Ormonde Mining',evEbitda:'–',ps:'–',mktcap:'~€15M (hist.)',status:'Barruecopardo → myyty EQR:lle',note:'Historiallinen'},
+    {name:'EQR (tämä malli)',evEbitda:fi(V.evMultiple,1)+'x',ps:fi(SP*V.sharesOut*V.audUsd/r.grossRev,1)+'x',mktcap:'A$'+fi(SP*V.sharesOut,0)+'M',status:'Mt Carbine + Barruecopardo',note:'Nykyinen'},
   ];
-  document.getElementById('bridge').innerHTML = brows.map(([l,v,bold,c])=>
-    `<div class="brow${bold?' bold':''}">
-      <span class="bl">${l}</span>
-      <span class="bv" style="color:${c}">${v}</span>
-    </div>`).join('');
+  let peerH=`<table class="ptbl"><thead><tr><th>Yhtiö</th><th>EV/EBITDA</th><th>P/S</th><th>Mkt Cap</th><th>Status</th></tr></thead><tbody>`;
+  peers.forEach(p=>{
+    const hl=p.name.includes('EQR')?'hl':'';
+    peerH+=`<tr class="${hl}"><td>${p.name}</td><td>${p.evEbitda}</td><td>${p.ps}</td><td>${p.mktcap}</td><td style="font-size:9px;">${p.status}</td></tr>`;
+  });
+  peerH+='</tbody></table>';
+  peerH+=`<div style="font-size:9px;color:#4b5563;margin-top:10px;line-height:1.6;">
+    <b>Almonty</b> on selkeästi lähin vertailukohta — ainoa merkittävä ei-kiinalainen tungsten-tuottaja. Mkt cap C$6,5B (3/2026) vs. EQR A$1,6B. Almonty on pre-profit (TTM tappio -$65M), P/S 169x vs. EQR:n forward-mallin P/S. Sangdong-kaivoksen (Korea) tuotannon käynnistyminen on avaintekijä.<br>
+    <b>*</b> Almonty on vielä tappiollinen (EPS -$0.33 TTM) joten EV/EBITDA ei ole mielekäs. Arvostus perustuu Sangdong-optioarvoon.<br>
+    Wolf Minerals (Drakelands) meni konkurssiin 2018 kustannusylitysten vuoksi — muistutus operatiivisista riskeistä.</div>`;
+  document.getElementById('peer-detail').innerHTML=peerH;
 
-  // STOCK PANEL
-  renderStockPanel(r);
+  // ── NAV TAB (Sum-of-the-Parts) ──
+  const mcRevA=r.grossRev*(V.mtCarbine/total), brRevA=r.grossRev*(V.barruecopardo/total);
+  const mcEbitda=mcRevA-(V.mcAisc*V.mtCarbine*100/1e6)-(V.corpOverhead*V.mtCarbine/total);
+  const brEbitda=brRevA-(V.brAisc*V.barruecopardo*100/1e6)-(V.corpOverhead*V.barruecopardo/total);
+  const mcNAV=mcEbitda*V.evMultiple, brNAV=brEbitda*V.evMultiple;
+  const cashVal=V.netDebt>0?-V.netDebt:Math.abs(V.netDebt);
+  const totalNAV=mcNAV+brNAV-V.netDebt;
+  const navPerShare=totalNAV/V.sharesOut/V.audUsd;
+  let navH=`<div class="irow"><span class="il">Mt Carbine (EBITDA $${fi(mcEbitda,1)}M × ${V.evMultiple}x)</span><span class="iv" style="color:var(--blue)">${fM(mcNAV)}</span></div>`;
+  navH+=`<div class="irow"><span class="il">Barruecopardo (EBITDA $${fi(brEbitda,1)}M × ${V.evMultiple}x)</span><span class="iv" style="color:#38bdf8">${fM(brNAV)}</span></div>`;
+  navH+=`<div class="irow"><span class="il">− Netto velka</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
+  navH+=`<div class="irow bold"><span class="il">Kokonais-NAV</span><span class="iv" style="color:var(--gold)">${fM(totalNAV)}</span></div>`;
+  navH+=`<div class="irow bold"><span class="il">NAV / osake (A$)</span><span class="iv" style="color:var(--gold);font-size:16px;">${fA(navPerShare)}</span></div>`;
+  // Pie-style breakdown
+  const mcPct=mcNAV/(mcNAV+brNAV)*100, brPct=100-mcPct;
+  navH+=`<div style="margin-top:14px;"><div style="display:flex;height:16px;border-radius:4px;overflow:hidden;">
+    <div style="width:${mcPct}%;background:var(--blue);"></div><div style="width:${brPct}%;background:#38bdf8;"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:4px;"><span>Mt Carbine ${fi(mcPct,0)}%</span><span>Barruecopardo ${fi(brPct,0)}%</span></div></div>`;
+  document.getElementById('nav-detail').innerHTML=navH;
+
+  // ── TIMELINE TAB (2026-2030) ──
+  const yrs=[2026,2027,2028,2029,2030];
+  const aptPath=[V.aptPrice,V.aptPrice*0.95,V.aptPrice*0.90,V.aptPrice*0.88,V.aptPrice*0.85]; // mean-reversion
+  const mcProd=[V.mtCarbine,V.mtCarbine*1.1,V.mtCarbine*1.2,V.mtCarbine*1.25,V.mtCarbine*1.25];
+  const brProd=[V.barruecopardo,V.barruecopardo*1.05,V.barruecopardo*1.1,V.barruecopardo*1.1,V.barruecopardo*1.1];
+  const recPath=[V.recoveryRate,Math.min(95,V.recoveryRate+3),Math.min(95,V.recoveryRate+5),Math.min(95,V.recoveryRate+7),Math.min(95,V.recoveryRate+8)];
+
+  let tlH=`<table class="stbl"><thead><tr><th></th>${yrs.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody>`;
+  const tlRows=[];
+  yrs.forEach((y,i)=>{
+    const t2=mcProd[i]+brProd[i];
+    const rp2=aptPath[i]*(V.concRealisation/100);
+    const rev=(rp2*t2*100/1e6)*(recPath[i]/100);
+    const cost=V.aisc*t2*100/1e6;
+    const ebitda2=rev-cost-V.corpOverhead;
+    const ebit2=ebitda2-V.da;
+    const ni2=ebit2>0?ebit2*0.70:ebit2;
+    const eps2=ni2/V.sharesOut;
+    tlRows.push({y,apt:aptPath[i],prod:t2,rec:recPath[i],rev,ebitda:ebitda2,ni:ni2,eps:eps2});
+  });
+  [['APT ($/mtu)',r=>fi(r.apt,0)],['Tuotanto (t WO3)',r=>fi(r.prod,0)],['Recovery (%)',r=>fi(r.rec,0)+'%'],
+   ['Liikevaihto (M$)',r=>fi(r.rev,1)],['EBITDA (M$)',r=>fi(r.ebitda,1)],['Nettotulos (M$)',r=>fi(r.ni,1)],
+   ['EPS (USD)',r=>fU(r.eps,3)]].forEach(([l,fn])=>{
+    tlH+=`<tr><td>${l}</td>${tlRows.map(r=>`<td>${fn(r)}</td>`).join('')}</tr>`;
+  });
+  tlH+='</tbody></table>';
+  tlH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">Oletukset: APT laskee 3–5%/v (mean-reversion), tuotanto kasvaa ramp-up-suunnitelman mukaan, recovery nousee vaiheittain. Muut parametrit pysyvät vakiona.</div>`;
+  document.getElementById('timeline-detail').innerHTML=tlH;
+
+  // Auto-update Monte Carlo if its tab is visible
+  if(document.getElementById('tc-mc').classList.contains('active')) runMonteCarlo();
 }
 
-// ── RESET ─────────────────────────────────────────────────────────────────
-function resetAll() {
-  loadScenario('base');
-  SP = 0.345;
-  document.getElementById('sp-input').value = '0.345';
-  render();
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-rebuildAll();
-render();
+// ═══════════════════════════════════════════════════════════════════════════
+// RESET & INIT
+// ═══════════════════════════════════════════════════════════════════════════
+function resetAll(){loadScenario('base');SP=0.345;document.getElementById('sp-input').value='0.345';render();}
+rebuildAll(); render();
 </script>
 </body>
 </html>
