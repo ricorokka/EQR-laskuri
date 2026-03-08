@@ -118,7 +118,13 @@
     <div class="logo-bar"></div>
     <div><div class="logo-text">EQ Resources</div><div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div></div>
   </div>
-  <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="display:flex;gap:2px;">
+      <button class="reset-btn" style="padding:5px 10px;font-size:10px;" onclick="setLang('fi')" id="lang-fi">🇫🇮 FI</button>
+      <button class="reset-btn" style="padding:5px 10px;font-size:10px;" onclick="setLang('en')" id="lang-en">🇬🇧 EN</button>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+  </div>
   <div id="live-status" style="font-size:9px;font-family:var(--mono);color:#4b5563;text-align:right;line-height:1.4;"></div>
 </header>
 
@@ -254,6 +260,95 @@ const SCENARIOS = {
     values:{aptPrice:5000,concRealisation:85,mtCarbine:2000,barruecopardo:2500,recoveryRate:92,c1Cost:155,aisc:220,corpOverhead:14,da:20,sharesOut:5000,netDebt:20,evMultiple:8,peMultiple:12,audUsd:0.700,wacc:10,terminalGrowth:2.5,forecastYears:8,capex:18,nwcPct:4,mcAisc:220,brAisc:200,mcConc:80,brConc:85}}
 };
 let V={...DEFAULTS}, SP=0.345, activeScenario='base';
+let LANG = 'fi'; // current language
+
+// ═══════════════════════════════════════════════════════════════════════════
+// i18n TRANSLATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const T = {
+  // Tab names
+  tabCore:       {fi:'Perusmalli',en:'Core Model'},
+  tabDCF:        {fi:'DCF',en:'DCF'},
+  tabBreakeven:  {fi:'Breakeven',en:'Breakeven'},
+  tabPeers:      {fi:'Vertailuarvostus',en:'Peer Comparison'},
+  tabNAV:        {fi:'NAV-erittely',en:'NAV Breakdown'},
+  tabTimeline:   {fi:'2026–2030',en:'2026–2030'},
+  tabMC:         {fi:'Monte Carlo',en:'Monte Carlo'},
+  tabActuals:    {fi:'📊 Toteumat',en:'📊 Actuals'},
+  // Scenarios
+  scBear:        {fi:'Bear',en:'Bear'},
+  scBase:        {fi:'Base',en:'Base'},
+  scBull:        {fi:'Bull',en:'Bull'},
+  scMega:        {fi:'Mega',en:'Mega'},
+  scDescBase:    {fi:'<b>Base:</b> APT viimeisin hinta config.json:sta. Johdon ohjausalue. Säädä slidereillä.',en:'<b>Base:</b> Latest APT price from config.json. Management guidance. Adjust with sliders.'},
+  scDescBear:    {fi:'<b>Bear:</b> APT $1 200, hidas ramp-up, konservatiivinen arvostus.',en:'<b>Bear:</b> APT $1,200, slow ramp-up, conservative valuation.'},
+  scDescBull:    {fi:'<b>Bull:</b> APT $3 500, täysi kapasiteetti, 90% recovery.',en:'<b>Bull:</b> APT $3,500, full capacity, 90% recovery.'},
+  scDescMega:    {fi:'<b>Mega:</b> APT $5 000+ supercycle. Spekulatiivinen.',en:'<b>Mega:</b> APT $5,000+ supercycle. Speculative.'},
+  scCustom:      {fi:'<b>Omat asetukset</b> — muokattu käsin.',en:'<b>Custom settings</b> — manually adjusted.'},
+  // Section titles
+  secScenarios:  {fi:'Skenaariot',en:'Scenarios'},
+  secPrice:      {fi:'Tungsten-hinta',en:'Tungsten Price'},
+  secProd:       {fi:'Tuotanto',en:'Production'},
+  secCost:       {fi:'Kustannukset',en:'Costs'},
+  secFin:        {fi:'Rahoitus & Arvostus',en:'Finance & Valuation'},
+  secDCF:        {fi:'DCF-parametrit',en:'DCF Parameters'},
+  // KPIs
+  kpiRevenue:    {fi:'Liikevaihto',en:'Revenue'},
+  kpiEBITDA:     {fi:'EBITDA',en:'EBITDA'},
+  kpiNI:         {fi:'Nettotulos',en:'Net Income'},
+  kpiProd:       {fi:'Tuotanto',en:'Production'},
+  kpiEPS:        {fi:'EPS',en:'EPS'},
+  kpiDCF:        {fi:'DCF/osake',en:'DCF/share'},
+  kpiAvg:        {fi:'Avg. tavoite',en:'Avg. target'},
+  // Stock panel
+  spCourse:      {fi:'Syötä osakekurssi',en:'Enter share price'},
+  spMktCap:      {fi:'Markkina-arvo',en:'Market Cap'},
+  // Cards
+  cIncome:       {fi:'▸ Tuloslaskelma (M USD)',en:'▸ Income Statement (M USD)'},
+  cMargins:      {fi:'▸ Marginaalit & Spredit',en:'▸ Margins & Spreads'},
+  cSens:         {fi:'▸ Herkkyysanalyysi — EPS (USD)',en:'▸ Sensitivity — EPS (USD)'},
+  cBridge:       {fi:'▸ Arvostussilta (A$/osake)',en:'▸ Valuation Bridge (A$/share)'},
+  cDCF:          {fi:'▸ DCF — Diskontattu kassavirta-analyysi',en:'▸ DCF — Discounted Cash Flow'},
+  cDCFsens:      {fi:'▸ DCF-herkkyys — WACC vs. Terminaalikasvu',en:'▸ DCF Sensitivity — WACC vs. Terminal Growth'},
+  cBreakeven:    {fi:'▸ Kaivoskohtainen breakeven-analyysi',en:'▸ Mine-level Breakeven Analysis'},
+  cPeers:        {fi:'▸ Vertailuarvostus — Tungsten-yhtiöt',en:'▸ Peer Comparison — Tungsten Companies'},
+  cNAV:          {fi:'▸ Osakekohtainen NAV-erittely (Sum-of-the-Parts)',en:'▸ Per-share NAV (Sum-of-the-Parts)'},
+  cTimeline:     {fi:'▸ 5-vuotisennuste 2026–2030 (M USD)',en:'▸ 5-Year Forecast 2026–2030 (M USD)'},
+  cMC:           {fi:'▸ Monte Carlo -simulaatio (5 000 ajoa)',en:'▸ Monte Carlo Simulation (5,000 runs)'},
+  cActuals:      {fi:'▸ Toteumat vs. mallin ennuste',en:'▸ Actuals vs. Model Forecast'},
+  cConfig:       {fi:'▸ Config-tiedoston tiedot',en:'▸ Config File Details'},
+  // Misc
+  liveLoading:   {fi:'⏳ Haetaan live-dataa...',en:'⏳ Fetching live data...'},
+  liveOK:        {fi:'🟢 Live',en:'🟢 Live'},
+  liveFail:      {fi:'🔴 Live-data ei saatavilla',en:'🔴 Live data unavailable'},
+  aptStale:      {fi:'⚠️ APT-hinta on yli 7 pv vanha — päivitä config.json',en:'⚠️ APT price is over 7 days old — update config.json'},
+  safetyMargin:  {fi:'Turvamarginaali',en:'Safety margin'},
+  median:        {fi:'Mediaani (P50)',en:'Median (P50)'},
+  mean:          {fi:'Keskiarvo',en:'Mean'},
+  probAbove:     {fi:'Todennäk. nousua',en:'Prob. of upside'},
+  target:        {fi:'Tavoite',en:'Target'},
+};
+function t(key){ return T[key]?T[key][LANG]||T[key].fi:key; }
+
+function setLang(lang) {
+  LANG = lang;
+  document.getElementById('lang-fi').style.borderColor = lang==='fi' ? 'var(--gold)' : '#374151';
+  document.getElementById('lang-en').style.borderColor = lang==='en' ? 'var(--gold)' : '#374151';
+  document.getElementById('lang-fi').style.color = lang==='fi' ? 'var(--gold)' : 'var(--text-dim)';
+  document.getElementById('lang-en').style.color = lang==='en' ? 'var(--gold)' : 'var(--text-dim)';
+  // Update tab labels
+  const tabNames = ['tabCore','tabDCF','tabBreakeven','tabPeers','tabNAV','tabTimeline','tabMC','tabActuals'];
+  document.querySelectorAll('.tab').forEach((tab,i) => { if(tabNames[i]) tab.textContent = t(tabNames[i]); });
+  // Update section titles
+  const secs = [['secScenarios','--gold'],['secPrice','--gold'],['secProd','--blue'],['secCost','--red'],['secFin','--green'],['secDCF','--cyan']];
+  document.querySelectorAll('.section-title').forEach((el,i) => { if(secs[i]) el.innerHTML = '<span style="display:block;width:16px;height:2px;background:currentColor;flex-shrink:0;"></span>' + t(secs[i][0]); });
+  // Update scenario descriptions
+  if(activeScenario && SCENARIOS[activeScenario]) {
+    const descKeys = {bear:'scDescBear',base:'scDescBase',bull:'scDescBull',mega:'scDescMega'};
+    document.getElementById('sc-desc').innerHTML = t(descKeys[activeScenario] || 'scDescBase');
+  }
+  render();
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SLIDER DEFINITIONS
@@ -379,7 +474,7 @@ function markCustom(){
   if(activeScenario!=='custom'){
     activeScenario='custom';
     document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('sc-desc').innerHTML='<b>Omat asetukset</b> — muokattu käsin.';
+    document.getElementById('sc-desc').innerHTML=t('scCustom');
   }
 }
 function buildSliders(group,containerId){
@@ -497,14 +592,14 @@ function render(){
 
   // KPIs
   document.getElementById('kpi-top').innerHTML=
-    kpi('Liikevaihto',fM(r.grossRev),'M USD / vuosi','var(--gold)',true)+
-    kpi('EBITDA',fM(r.ebitda),'Marginaali '+fi(r.ebitdaMargin,1)+'%',pos(r.ebitda),true)+
-    kpi('Nettotulos',fM(r.ni),'Vero 30%',pos(r.ni),true);
+    kpi(t('kpiRevenue'),fM(r.grossRev),'M USD / '+{fi:'vuosi',en:'year'}[LANG],'var(--gold)',true)+
+    kpi(t('kpiEBITDA'),fM(r.ebitda),{fi:'Marginaali',en:'Margin'}[LANG]+' '+fi(r.ebitdaMargin,1)+'%',pos(r.ebitda),true)+
+    kpi(t('kpiNI'),fM(r.ni),{fi:'Vero 30%',en:'Tax 30%'}[LANG],pos(r.ni),true);
   document.getElementById('kpi-bot').innerHTML=
-    kpi('Tuotanto',fi(total,0)+' t',scLabel,total>=3000?'var(--green)':'#f59e0b')+
-    kpi('EPS',fU(r.eps,3),'A$'+fi(r.epsAUD,3),'var(--purple)')+
-    kpi('DCF/osake',fA(dcf.perShareAUD),'WACC '+V.wacc+'%','var(--cyan)')+
-    kpi('Avg. tavoite',fA((r.avgAUD+dcf.perShareAUD)/2),'EV/EBITDA + P/E + DCF','var(--gold)');
+    kpi(t('kpiProd'),fi(total,0)+' t',scLabel,total>=3000?'var(--green)':'#f59e0b')+
+    kpi(t('kpiEPS'),fU(r.eps,3),'A$'+fi(r.epsAUD,3),'var(--purple)')+
+    kpi(t('kpiDCF'),fA(dcf.perShareAUD),'WACC '+V.wacc+'%','var(--cyan)')+
+    kpi(t('kpiAvg'),fA((r.avgAUD+dcf.perShareAUD)/2),'EV/EBITDA + P/E + DCF','var(--gold)');
 
   // Stock panel
   const sp=SP, mcAUD=sp*V.sharesOut, mcUSD=mcAUD*V.audUsd;
@@ -768,18 +863,34 @@ async function loadConfig() {
       const m = LIVE_DATA.config.market;
       if(m) {
         if(m.sharePrice && !LIVE_DATA.sharePrice) { SP = m.sharePrice; document.getElementById('sp-input').value = SP.toFixed(3); }
-        if(m.aptPrice) DEFAULTS.aptPrice = m.aptPrice;
+        if(m.aptPrice) { DEFAULTS.aptPrice = m.aptPrice; }
         if(m.sharesOut) DEFAULTS.sharesOut = m.sharesOut;
         if(m.audUsd && !LIVE_DATA.audUsd) DEFAULTS.audUsd = m.audUsd;
+        if(m.netDebt !== undefined) DEFAULTS.netDebt = m.netDebt;
         if(m.wk52low) window._wkLow = m.wk52low;
         if(m.wk52high) window._wkHigh = m.wk52high;
-        // Reload base scenario with updated defaults
+        // Always update base scenario with latest config values
         SCENARIOS.base.values = {...DEFAULTS};
+        // Update scenario button label to show current APT
+        const baseBtn = document.getElementById('sc-base');
+        if(baseBtn && m.aptPrice) baseBtn.querySelector('.sc-detail').textContent = 'APT $' + m.aptPrice.toLocaleString('fi-FI');
+        // If user is on base scenario, reload with new values
         if(activeScenario === 'base') { V = {...DEFAULTS}; rebuildAll(); }
       }
       render();
     }
   } catch(e) { LIVE_DATA.errors.push('Config: '+e.message); }
+  // Check APT staleness
+  if(LIVE_DATA.config && LIVE_DATA.config.lastUpdated) {
+    const updated = new Date(LIVE_DATA.config.lastUpdated);
+    const now = new Date();
+    const daysDiff = (now - updated) / (1000*60*60*24);
+    if(daysDiff > 7) {
+      const status = document.getElementById('live-status');
+      status.innerHTML += '<br>' + t('aptStale');
+      status.style.color = 'var(--orange)';
+    }
+  }
 }
 
 // Render actuals tab
