@@ -119,6 +119,7 @@
     <div><div class="logo-text">EQ Resources</div><div class="logo-sub">ASX: EQR — FINANCIAL MODEL</div></div>
   </div>
   <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+  <div id="live-status" style="font-size:9px;font-family:var(--mono);color:#4b5563;text-align:right;line-height:1.4;"></div>
 </header>
 
 <div class="layout">
@@ -177,6 +178,7 @@
       <div class="tab" onclick="switchTab('nav')">NAV-erittely</div>
       <div class="tab" onclick="switchTab('timeline')">2026–2030</div>
       <div class="tab" onclick="switchTab('mc')">Monte Carlo</div>
+      <div class="tab" onclick="switchTab('actuals')">📊 Toteumat</div>
     </div>
 
     <!-- TAB: CORE -->
@@ -216,6 +218,12 @@
     <!-- TAB: MONTE CARLO -->
     <div class="tab-content" id="tc-mc">
       <div class="card"><div class="card-title">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;">Satunnainen APT-hinta (±40%), tuotanto (±25%), recovery (±10%), AISC (±20%). Lognormaalijakauma.</div></div>
+    </div>
+
+    <!-- TAB: ACTUALS -->
+    <div class="tab-content" id="tc-actuals">
+      <div class="card"><div class="card-title">▸ Toteumat vs. mallin ennuste</div><div id="actuals-detail"></div></div>
+      <div class="card"><div class="card-title">▸ Config-tiedoston tiedot</div><div id="config-detail"></div></div>
     </div>
 
     <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. Käytä omaa harkintaa.<br>📊 Oletusarvot: APT ~$2 160/mtu (3/2026), AUD/USD ~0.700, osakkeet ~4 800M. Lähteet: Fastmarkets, Investing.com, SMM.</div>
@@ -292,15 +300,16 @@ function fmtSV(v,u){if(u==='USD/mtu')return'$'+Math.round(v);if(u==='%')return v
 
 function switchTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',t.textContent.toLowerCase().includes(id)||
-    (id==='core'&&i===0)||(id==='dcf'&&i===1)||(id==='breakeven'&&i===2)||(id==='peers'&&i===3)||(id==='nav'&&i===4)||(id==='timeline'&&i===5)||(id==='mc'&&i===6)));
+    (id==='core'&&i===0)||(id==='dcf'&&i===1)||(id==='breakeven'&&i===2)||(id==='peers'&&i===3)||(id==='nav'&&i===4)||(id==='timeline'&&i===5)||(id==='mc'&&i===6)||(id==='actuals'&&i===7)));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   document.getElementById('tc-'+id).classList.add('active');
   if(id==='mc') runMonteCarlo();
+  if(id==='actuals') renderActuals();
 }
 // Simple tab switch
 document.addEventListener('click',e=>{
   if(!e.target.classList.contains('tab'))return;
-  const tabs=['core','dcf','breakeven','peers','nav','timeline','mc'];
+  const tabs=['core','dcf','breakeven','peers','nav','timeline','mc','actuals'];
   const idx=[...document.querySelectorAll('.tab')].indexOf(e.target);
   if(idx>=0&&idx<tabs.length){
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -308,6 +317,7 @@ document.addEventListener('click',e=>{
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
     document.getElementById('tc-'+tabs[idx]).classList.add('active');
     if(tabs[idx]==='mc')runMonteCarlo();
+    if(tabs[idx]==='actuals')renderActuals();
   }
 });
 
@@ -680,6 +690,167 @@ function render(){
 
   // Auto-update Monte Carlo if its tab is visible
   if(document.getElementById('tc-mc').classList.contains('active')) runMonteCarlo();
+
+  // Render actuals if tab visible
+  if(document.getElementById('tc-actuals') && document.getElementById('tc-actuals').classList.contains('active')) renderActuals();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVE DATA & CONFIG
+// ═══════════════════════════════════════════════════════════════════════════
+let LIVE_DATA = { sharePrice:null, audUsd:null, configLoaded:false, config:null, errors:[] };
+
+// Yahoo Finance via CORS proxy (allorigins)
+async function fetchLivePrice() {
+  const status = document.getElementById('live-status');
+  status.innerHTML = '⏳ Haetaan live-dataa...';
+  try {
+    // EQR.AX share price
+    const eqrUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/EQR.AX?interval=1d&range=1d';
+    const eqrProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(eqrUrl);
+    const eqrResp = await fetch(eqrProxy); 
+    if(eqrResp.ok) {
+      const eqrData = await eqrResp.json();
+      const price = eqrData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(price && price > 0) { LIVE_DATA.sharePrice = price; }
+    }
+  } catch(e) { LIVE_DATA.errors.push('EQR: '+e.message); }
+
+  try {
+    // AUD/USD
+    const fxUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1d&range=1d';
+    const fxProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(fxUrl);
+    const fxResp = await fetch(fxProxy);
+    if(fxResp.ok) {
+      const fxData = await fxResp.json();
+      const rate = fxData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(rate && rate > 0) { LIVE_DATA.audUsd = rate; }
+    }
+  } catch(e) { LIVE_DATA.errors.push('FX: '+e.message); }
+
+  // Apply live data
+  if(LIVE_DATA.sharePrice) {
+    SP = LIVE_DATA.sharePrice;
+    document.getElementById('sp-input').value = SP.toFixed(3);
+  }
+  if(LIVE_DATA.audUsd && activeScenario === 'base') {
+    V.audUsd = Math.round(LIVE_DATA.audUsd * 1000) / 1000;
+  }
+
+  // Update status
+  const parts = [];
+  if(LIVE_DATA.sharePrice) parts.push('EQR A$' + LIVE_DATA.sharePrice.toFixed(3));
+  if(LIVE_DATA.audUsd) parts.push('AUD/USD ' + LIVE_DATA.audUsd.toFixed(3));
+  if(parts.length > 0) {
+    status.innerHTML = '🟢 Live: ' + parts.join(' | ');
+    status.style.color = 'var(--green)';
+  } else {
+    status.innerHTML = '🔴 Live-data ei saatavilla';
+    status.style.color = 'var(--red)';
+  }
+
+  if(LIVE_DATA.audUsd && activeScenario === 'base') rebuildAll();
+  render();
+}
+
+// Load config.json from GitHub repo
+async function loadConfig() {
+  try {
+    // Try loading from same directory first (GitHub Pages), then from raw GitHub
+    let resp = await fetch('./config.json');
+    if(!resp.ok) {
+      resp = await fetch('https://raw.githubusercontent.com/ricorokka/EQR-laskuri/main/config.json');
+    }
+    if(resp.ok) {
+      LIVE_DATA.config = await resp.json();
+      LIVE_DATA.configLoaded = true;
+      // Apply config market data to defaults if base scenario
+      const m = LIVE_DATA.config.market;
+      if(m) {
+        if(m.sharePrice && !LIVE_DATA.sharePrice) { SP = m.sharePrice; document.getElementById('sp-input').value = SP.toFixed(3); }
+        if(m.aptPrice) DEFAULTS.aptPrice = m.aptPrice;
+        if(m.sharesOut) DEFAULTS.sharesOut = m.sharesOut;
+        if(m.audUsd && !LIVE_DATA.audUsd) DEFAULTS.audUsd = m.audUsd;
+        if(m.wk52low) window._wkLow = m.wk52low;
+        if(m.wk52high) window._wkHigh = m.wk52high;
+        // Reload base scenario with updated defaults
+        SCENARIOS.base.values = {...DEFAULTS};
+        if(activeScenario === 'base') { V = {...DEFAULTS}; rebuildAll(); }
+      }
+      render();
+    }
+  } catch(e) { LIVE_DATA.errors.push('Config: '+e.message); }
+}
+
+// Render actuals tab
+function renderActuals() {
+  const cfg = LIVE_DATA.config;
+  const r = calc(V);
+  
+  if(!cfg || !cfg.actuals) {
+    document.getElementById('actuals-detail').innerHTML = '<div style="color:var(--text-muted);font-size:11px;">Config.json ei ladattu tai toteumatietoja ei löydy.</div>';
+    document.getElementById('config-detail').innerHTML = '';
+    return;
+  }
+
+  // Build actuals vs forecast comparison
+  let ah = '';
+  const periods = Object.entries(cfg.actuals);
+  
+  if(periods.length === 0) {
+    ah = '<div style="color:var(--text-muted);font-size:11px;">Ei toteumatietoja vielä. Päivitä config.json tulosjulkistuksen jälkeen.</div>';
+  } else {
+    ah += '<div style="margin-bottom:12px;">';
+    periods.forEach(([key, act]) => {
+      ah += `<div style="margin-bottom:16px;padding:12px;background:var(--bg4);border-radius:8px;border-left:3px solid var(--gold);">`;
+      ah += `<div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">${key} — ${act.period || ''}</div>`;
+      
+      const rows = [
+        ['Liikevaihto (A$M)', act.revenueAUD, r.grossRev / V.audUsd],
+        ['EBITDA (A$M)', act.ebitdaAUD, r.ebitda / V.audUsd],
+        ['Nettotulos (A$M)', act.netIncomeAUD, r.ni / V.audUsd],
+        ['EPS (A$)', act.epsAUD, r.eps / V.audUsd],
+      ];
+      
+      rows.forEach(([label, actual, forecast]) => {
+        const hasActual = actual !== null && actual !== undefined;
+        const actualStr = hasActual ? fi(actual, 2) : '—';
+        const forecastStr = fi(forecast, 2);
+        const diffPct = hasActual && forecast !== 0 ? ((actual - forecast) / Math.abs(forecast) * 100) : null;
+        const diffStr = diffPct !== null ? (diffPct >= 0 ? '+' : '') + fi(diffPct, 0) + '%' : '';
+        const diffColor = diffPct !== null ? (diffPct >= 0 ? 'var(--green)' : 'var(--red)') : 'var(--text-muted)';
+        
+        ah += `<div style="display:grid;grid-template-columns:1fr 80px 80px 60px;padding:3px 0;font-size:10px;">
+          <span style="color:var(--text-muted);">${label}</span>
+          <span style="text-align:right;font-family:var(--mono);color:${hasActual?'var(--text)':'#374151'};">${actualStr}</span>
+          <span style="text-align:right;font-family:var(--mono);color:var(--text-dim);">${forecastStr}</span>
+          <span style="text-align:right;font-family:var(--mono);font-weight:700;color:${diffColor};">${diffStr}</span>
+        </div>`;
+      });
+      
+      ah += `<div style="display:grid;grid-template-columns:1fr 80px 80px 60px;padding:3px 0;font-size:9px;color:#4b5563;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <span></span><span style="text-align:right;">Toteuma</span><span style="text-align:right;">Ennuste*</span><span style="text-align:right;">Ero</span></div>`;
+      
+      if(act.notes) ah += `<div style="font-size:9px;color:#4b5563;margin-top:6px;">📝 ${act.notes}</div>`;
+      ah += '</div>';
+    });
+    ah += '</div>';
+    ah += `<div style="font-size:9px;color:#4b5563;">* Ennuste = mallin nykyinen vuositasoinen ennuste muutettuna AUD:ksi. Toteumat ovat raportointikauden lukuja.<br>Päivitä toteumat: muokkaa <a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);">config.json</a> GitHubissa.</div>`;
+  }
+  document.getElementById('actuals-detail').innerHTML = ah;
+
+  // Config details
+  let ch = `<div style="font-size:10px;color:var(--text-dim);line-height:1.8;">`;
+  ch += `<b>Viimeisin päivitys:</b> ${cfg.lastUpdated || '—'} (${cfg.lastUpdatedBy || '—'})<br>`;
+  if(cfg.market) {
+    const m = cfg.market;
+    ch += `<b>Config-arvot:</b> APT $${m.aptPrice||'—'}/mtu, kurssi A$${m.sharePrice||'—'}, osakkeet ${m.sharesOut||'—'}M, AUD/USD ${m.audUsd||'—'}<br>`;
+  }
+  ch += `<b>Live-data:</b> ${LIVE_DATA.sharePrice ? 'EQR A$'+LIVE_DATA.sharePrice.toFixed(3) : 'ei saatavilla'} | ${LIVE_DATA.audUsd ? 'AUD/USD '+LIVE_DATA.audUsd.toFixed(3) : 'ei saatavilla'}<br>`;
+  if(LIVE_DATA.errors.length > 0) ch += `<b>Virheet:</b> ${LIVE_DATA.errors.join(', ')}<br>`;
+  ch += `<br><a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);text-decoration:underline;">✏️ Muokkaa config.json GitHubissa</a>`;
+  ch += '</div>';
+  document.getElementById('config-detail').innerHTML = ch;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -687,6 +858,8 @@ function render(){
 // ═══════════════════════════════════════════════════════════════════════════
 function resetAll(){loadScenario('base');SP=0.345;document.getElementById('sp-input').value='0.345';render();}
 rebuildAll(); render();
+// Load config and live data on startup
+loadConfig().then(() => fetchLivePrice());
 </script>
 </body>
 </html>

@@ -1,0 +1,43 @@
+{
+  "_comment": "EQR Financial Model — Config. Päivitä tämä tulosjulkistuksen jälkeen.",
+  "lastUpdated": "2026-03-08",
+  "lastUpdatedBy": "Rico",
+
+  "market": {
+    "sharePrice": 0.345,
+    "sharesOut": 4800,
+    "wk52low": 0.028,
+    "wk52high": 0.390,
+    "aptPrice": 2160,
+    "audUsd": 0.700
+  },
+
+  "actuals": {
+    "H1_FY2026": {
+      "period": "Jul–Dec 2025",
+      "revenueAUD": null,
+      "ebitdaAUD": null,
+      "netIncomeAUD": null,
+      "epsAUD": null,
+      "cashAUD": null,
+      "debtAUD": null,
+      "mtCarbineWO3": null,
+      "barruecopardoWO3": null,
+      "notes": "Tulos julkaistaan ~12.3.2026"
+    },
+    "FY2025": {
+      "period": "Jul 2024–Jun 2025",
+      "revenueAUD": 66.33,
+      "ebitdaAUD": null,
+      "netIncomeAUD": -39.31,
+      "epsAUD": -0.02,
+      "cashAUD": 1.87,
+      "debtAUD": null,
+      "mtCarbineWO3": null,
+      "barruecopardoWO3": null,
+      "notes": "TTM data Yahoo Finance. Barruecopardo ei vielä tuottanut."
+    }
+  },
+
+  "notes": "Päivitä market-osio aina kun tarkistat. Päivitä actuals tulosjulkistuksen jälkeen. Rico: muokkaa tätä GitHubissa suoraan."
+}
