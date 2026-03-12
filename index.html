@@ -191,7 +191,7 @@
     <div class="tab-content active" id="tc-core">
       <div class="card"><div class="card-title">▸ Tuloslaskelma (M USD)</div><div id="income"></div></div>
       <div class="card"><div class="card-title">▸ Marginaalit & Spredit</div><div id="margins"></div></div>
-      <div class="card"><div class="card-title">▸ Herkkyysanalyysi — EPS (USD)</div><div style="overflow-x:auto;" id="senswrap"></div><div style="font-size:9px;color:#4b5563;margin-top:8px;">* Korostettu = nykyiset parametrit | Vihreä = parempi | Punainen = alle 50% base</div></div>
+      <div class="card"><div class="card-title">▸ Herkkyysanalyysi — EPS (USD)</div><div style="overflow-x:auto;" id="senswrap"></div><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="sens-note"></div></div>
       <div class="card"><div class="card-title">▸ Arvostussilta (A$/osake)</div><div id="bridge"></div></div>
     </div>
 
@@ -223,7 +223,7 @@
 
     <!-- TAB: MONTE CARLO -->
     <div class="tab-content" id="tc-mc">
-      <div class="card"><div class="card-title">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;">Satunnainen APT-hinta (±40%), tuotanto (±25%), recovery (±10%), AISC (±20%). Lognormaalijakauma.</div></div>
+      <div class="card"><div class="card-title">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="mc-note"></div></div>
     </div>
 
     <!-- TAB: ACTUALS -->
@@ -232,7 +232,7 @@
       <div class="card"><div class="card-title">▸ Config-tiedoston tiedot</div><div id="config-detail"></div></div>
     </div>
 
-    <div class="disclaimer">⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. Käytä omaa harkintaa.<br>📊 Oletusarvot: APT ~$2 160/mtu (3/2026), AUD/USD ~0.700, osakkeet ~4 800M. Lähteet: Fastmarkets, Investing.com, SMM.</div>
+    <div class="disclaimer" id="disclaimer-text"></div>
   </div>
 </div>
 
@@ -327,6 +327,143 @@ const T = {
   mean:          {fi:'Keskiarvo',en:'Mean'},
   probAbove:     {fi:'Todennäk. nousua',en:'Prob. of upside'},
   target:        {fi:'Tavoite',en:'Target'},
+  // Income statement rows
+  isRevTotal:    {fi:'Liikevaihto yhteensä',en:'Total Revenue'},
+  isAISC:        {fi:'AISC-kustannukset',en:'AISC Costs'},
+  isGross:       {fi:'Bruttokate',en:'Gross Profit'},
+  isOverhead:    {fi:'Yleiskulut',en:'Corporate Overhead'},
+  isDA:          {fi:'D&A poistot',en:'D&A'},
+  isTax:         {fi:'Vero (30%)',en:'Tax (30%)'},
+  isNI:          {fi:'Nettotulos',en:'Net Income'},
+  // Margins
+  mGross:        {fi:'Bruttokate-marginaali',en:'Gross Margin'},
+  mEBITDA:       {fi:'EBITDA-marginaali',en:'EBITDA Margin'},
+  mNet:          {fi:'Netto-marginaali',en:'Net Margin'},
+  // Bridge
+  brNetDebt:     {fi:'− Netto velka',en:'− Net Debt'},
+  brEquity:      {fi:'= Equity (M USD)',en:'= Equity (M USD)'},
+  brAvg:         {fi:'Avg. tavoite (3 mallia)',en:'Avg. target (3 models)'},
+  // Breakeven
+  beMtCarbine:   {fi:'Mt Carbine BE',en:'Mt Carbine BE'},
+  beBarr:        {fi:'Barruecopardo BE',en:'Barruecopardo BE'},
+  beTotal:       {fi:'Koko yhtiö BE',en:'Full Company BE'},
+  beAPTzero:     {fi:'APT hinta jossa nolla',en:'APT price at breakeven'},
+  beInclOH:      {fi:'Sis. overhead + D&A',en:'Incl. overhead + D&A'},
+  beAbove:       {fi:'yli kokonais-breakeven-tason',en:'above full breakeven level'},
+  beProfitable:  {fi:'on kannattava kun APT >',en:'is profitable when APT >'},
+  // Slider subs
+  slConcSub:     {fi:'% APT-pariteettiin',en:'% of APT parity'},
+  slMcSub:       {fi:'Nyt ~1 200 → tavoite ~1 750 t',en:'Current ~1,200 → target ~1,750 t'},
+  slBrSub:       {fi:'Kapasiteetti ~1 600 t/a',en:'Capacity ~1,600 t/y'},
+  slRecSub:      {fi:'Nyt ~78% → APT-laitos 95%',en:'Current ~78% → APT plant 95%'},
+  slC1Sub:       {fi:'Suorat tuotantokulut',en:'Direct production costs'},
+  slAiscSub:     {fi:'All-in sustaining cost',en:'All-in sustaining cost'},
+  slOHSub:       {fi:'Corporate overhead',en:'Corporate overhead'},
+  slDASub:       {fi:'Depreciation & amortisation',en:'Depreciation & amortisation'},
+  slSharesSub:   {fi:'~4 800M (3/2026)',en:'~4,800M (3/2026)'},
+  slDebtSub:     {fi:'Velka − kassa',en:'Debt − cash'},
+  slEVSub:       {fi:'Vertaiskerroin',en:'Peer multiple'},
+  slPESub:       {fi:'P/E-kerroin',en:'P/E multiple'},
+  slFXSub:       {fi:'~0.700 (3/2026)',en:'~0.700 (3/2026)'},
+  slWaccSub:     {fi:'Painotettu pääomakustannus',en:'Weighted avg. cost of capital'},
+  slTermSub:     {fi:'Ikuinen kasvuoletus',en:'Perpetual growth assumption'},
+  slCapexSub:    {fi:'Vuotuiset investoinnit',en:'Annual capital expenditure'},
+  slNwcSub:      {fi:'Käyttöpääoman osuus',en:'Working capital % of revenue'},
+  slAPTSub:      {fi:'CIF Rotterdam — 3/2026: ~$2 160/mtu',en:'CIF Rotterdam — 3/2026: ~$2,160/mtu'},
+  // Slider labels
+  slConc:        {fi:'Concentraatti-realisaatio',en:'Concentrate Realisation'},
+  slShares:      {fi:'Osakkeet',en:'Shares Out'},
+  slDebt:        {fi:'Netto velka',en:'Net Debt'},
+  slOH:          {fi:'Yleiskulut',en:'Overhead'},
+  slTermGrowth:  {fi:'Terminaalikasvu',en:'Terminal Growth'},
+  slNwc:         {fi:'NWC % liikevaihdosta',en:'NWC % of Revenue'},
+  // DCF tab
+  dcfYear:       {fi:'Vuosi',en:'Year'},
+  dcfPVcf:       {fi:'PV kassavirroista',en:'PV of Cash Flows'},
+  dcfTV:         {fi:'Terminaaliarvo (PV)',en:'Terminal Value (PV)'},
+  dcfEqVal:      {fi:'Equity Value',en:'Equity Value'},
+  dcfPerShare:   {fi:'DCF / osake (A$)',en:'DCF / share (A$)'},
+  dcfTVshare:    {fi:'TV osuus EV:stä',en:'TV share of EV'},
+  // Peers
+  peerCompany:   {fi:'Yhtiö',en:'Company'},
+  peerStatus:    {fi:'Status',en:'Status'},
+  peerNote:      {fi:'Lähin vertailukohta',en:'Closest peer'},
+  peerCurrent:   {fi:'Nykyinen',en:'Current'},
+  // NAV
+  navTotal:      {fi:'Kokonais-NAV',en:'Total NAV'},
+  navPerShare:   {fi:'NAV / osake (A$)',en:'NAV / share (A$)'},
+  // Timeline
+  tlAPT:         {fi:'APT ($/mtu)',en:'APT ($/mtu)'},
+  tlProd:        {fi:'Tuotanto (t WO3)',en:'Production (t WO3)'},
+  tlRecovery:    {fi:'Recovery (%)',en:'Recovery (%)'},
+  tlRev:         {fi:'Liikevaihto (M$)',en:'Revenue (M$)'},
+  tlEBITDA:      {fi:'EBITDA (M$)',en:'EBITDA (M$)'},
+  tlNI:          {fi:'Nettotulos (M$)',en:'Net Income (M$)'},
+  tlEPS:         {fi:'EPS (USD)',en:'EPS (USD)'},
+  tlNote:        {fi:'Oletukset: APT laskee 3–5%/v (mean-reversion), tuotanto kasvaa ramp-up-suunnitelman mukaan, recovery nousee vaiheittain. Muut parametrit pysyvät vakiona.',en:'Assumptions: APT declines 3–5%/y (mean-reversion), production grows per ramp-up plan, recovery improves gradually. Other parameters held constant.'},
+  // Sensitivity
+  sensNote:      {fi:'* Korostettu = nykyiset parametrit | Vihreä = parempi | Punainen = alle 50% base',en:'* Highlighted = current params | Green = better | Red = below 50% base'},
+  // MC
+  mcRuns:        {fi:'5 000 ajoa',en:'5,000 runs'},
+  mcAbove:       {fi:'Todennäk. nousua',en:'Prob. of upside'},
+  mcNote:        {fi:'Satunnainen APT-hinta (±40%), tuotanto (±25%), recovery (±10%), AISC (±20%). Lognormaalijakauma.',en:'Randomized APT price (±40%), production (±25%), recovery (±10%), AISC (±20%). Lognormal distribution.'},
+  mcCourse:      {fi:'Kurssi',en:'Price'},
+  // Disclaimer
+  disclaimer1:   {fi:'⚠ Yksinkertaistettu analyyttinen malli, ei sijoitussuositus. Käytä omaa harkintaa.',en:'⚠ Simplified analytical model, not investment advice. Use your own judgment.'},
+  disclaimer2:   {fi:'📊 Oletusarvot: APT ~$2 160/mtu (3/2026), AUD/USD ~0.700, osakkeet ~4 800M. Lähteet: Fastmarkets, Investing.com, SMM.',en:'📊 Defaults: APT ~$2,160/mtu (3/2026), AUD/USD ~0.700, shares ~4,800M. Sources: Fastmarkets, Investing.com, SMM.'},
+  // Stock panel labels
+  spEVupside:    {fi:'EV/EBITDA upside',en:'EV/EBITDA upside'},
+  spDCFupside:   {fi:'DCF upside',en:'DCF upside'},
+  spAvgTarget:   {fi:'Avg. tavoite',en:'Avg. target'},
+  sp52wk:        {fi:'52vk',en:'52wk'},
+  spEnter:       {fi:'Syötä osakekurssi',en:'Enter share price'},
+  spPrice:       {fi:'ASX: EQR — Kurssi (A$)',en:'ASX: EQR — Price (A$)'},
+  // Actuals tab
+  actRevenue:    {fi:'Liikevaihto (A$M)',en:'Revenue (A$M)'},
+  actEBITDA:     {fi:'EBITDA (A$M)',en:'EBITDA (A$M)'},
+  actNI:         {fi:'Nettotulos (A$M)',en:'Net Income (A$M)'},
+  actEPS:        {fi:'EPS (A$)',en:'EPS (A$)'},
+  actActual:     {fi:'Toteuma',en:'Actual'},
+  actForecast:   {fi:'Ennuste*',en:'Forecast*'},
+  actDiff:       {fi:'Ero',en:'Diff'},
+  actNoData:     {fi:'Config.json ei ladattu tai toteumatietoja ei löydy.',en:'Config.json not loaded or no actuals data found.'},
+  actNoActuals:  {fi:'Ei toteumatietoja vielä. Päivitä config.json tulosjulkistuksen jälkeen.',en:'No actuals data yet. Update config.json after earnings release.'},
+  actFootnote:   {fi:'* Ennuste = mallin nykyinen vuositasoinen ennuste muutettuna AUD:ksi. Toteumat ovat raportointikauden lukuja.',en:'* Forecast = model\'s current annualized forecast converted to AUD. Actuals are reporting period figures.'},
+  actUpdate:     {fi:'Päivitä toteumat: muokkaa',en:'Update actuals: edit'},
+  actLastUpdate: {fi:'Viimeisin päivitys',en:'Last updated'},
+  actConfigVals: {fi:'Config-arvot',en:'Config values'},
+  actLiveData:   {fi:'Live-data',en:'Live data'},
+  actErrors:     {fi:'Virheet',en:'Errors'},
+  actEdit:       {fi:'✏️ Muokkaa config.json GitHubissa',en:'✏️ Edit config.json on GitHub'},
+  actNotAvail:   {fi:'ei saatavilla',en:'not available'},
+  // Production scale labels
+  prodBelow:     {fi:'⚠ Alle 3kt',en:'⚠ Below 3kt'},
+  prodLow:       {fi:'📍 Alaraja',en:'📍 Lower end'},
+  prodMid:       {fi:'✅ 3–4 kt',en:'✅ 3–4 kt'},
+  prodHigh:      {fi:'🚀 Tuplaus',en:'🚀 Doubling'},
+  prodBull:      {fi:'🔭 Bull',en:'🔭 Bull'},
+  // Year label
+  yearLabel:     {fi:'vuosi',en:'year'},
+  // Margin label
+  marginLabel:   {fi:'Marginaali',en:'Margin'},
+  taxLabel:      {fi:'Vero 30%',en:'Tax 30%'},
+  // Peer notes
+  peerAlmontyNote:{fi:'Lähin vertailukohta',en:'Closest peer'},
+  peerSpec:      {fi:'Spekulatiivinen',en:'Speculative'},
+  peerChinaNote: {fi:'Kiina-vertailu',en:'China peer'},
+  peerWolfNote:  {fi:'Varoittava esimerkki',en:'Cautionary tale'},
+  peerHistNote:  {fi:'Historiallinen',en:'Historical'},
+  peerCurrentNote:{fi:'Nykyinen',en:'Current'},
+  peerDiversified:{fi:'Diversifioitu (W, Mo, Co, Cu)',en:'Diversified (W, Mo, Co, Cu)'},
+  peerRampup:    {fi:'Sangdong (Korea) ramp-up, Panasqueira (Portugal), Gentung (USA)',en:'Sangdong (Korea) ramp-up, Panasqueira (Portugal), Gentung (USA)'},
+  peerPreRev:    {fi:'Pre-revenue',en:'Pre-revenue'},
+  peerLostCreek: {fi:'Lost Creek (USA) exploraatio',en:'Lost Creek (USA) exploration'},
+  peerWolf:      {fi:'Drakelands (UK) suljettu',en:'Drakelands (UK) closed'},
+  peerOrmonde:   {fi:'Barruecopardo → myyty EQR:lle',en:'Barruecopardo → sold to EQR'},
+  peerBankrupt:  {fi:'Konkurssi 2018',en:'Bankrupt 2018'},
+  peerAlmontyDesc:{fi:'Almonty on selkeästi lähin vertailukohta — ainoa merkittävä ei-kiinalainen tungsten-tuottaja.',en:'Almonty is clearly the closest peer — the only significant non-Chinese tungsten producer.'},
+  peerAlmontyEV: {fi:'Almonty on vielä tappiollinen (EPS -$0.33 TTM) joten EV/EBITDA ei ole mielekäs. Arvostus perustuu Sangdong-optioarvoon.',en:'Almonty is still unprofitable (EPS -$0.33 TTM) so EV/EBITDA is not meaningful. Valuation is based on Sangdong option value.'},
+  peerWolfWarn:  {fi:'Wolf Minerals (Drakelands) meni konkurssiin 2018 kustannusylitysten vuoksi — muistutus operatiivisista riskeistä.',en:'Wolf Minerals (Drakelands) went bankrupt in 2018 due to cost overruns — a reminder of operational risks.'},
 };
 function t(key){ return T[key]?T[key][LANG]||T[key].fi:key; }
 
@@ -347,42 +484,45 @@ function setLang(lang) {
     const descKeys = {bear:'scDescBear',base:'scDescBase',bull:'scDescBull',mega:'scDescMega'};
     document.getElementById('sc-desc').innerHTML = t(descKeys[activeScenario] || 'scDescBase');
   }
+  // Update stock panel labels
+  document.querySelector('#sp-input').parentElement.parentElement.querySelector('div:first-child').textContent = t('spPrice');
+  document.querySelector('#sp-input').parentElement.nextElementSibling.textContent = t('spEnter');
   render();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SLIDER DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════
-const SLIDERS = {
+function getSliders() { return {
   price:[
-    {key:'aptPrice',label:'APT spot-hinta',min:200,max:6000,step:25,unit:'USD/mtu',sub:'CIF Rotterdam — 3/2026: ~$2 160/mtu',color:'var(--gold)'},
-    {key:'concRealisation',label:'Concentraatti-realisaatio',min:40,max:95,step:1,unit:'%',sub:'% APT-pariteettiin',color:'#a78540'},
+    {key:'aptPrice',label:'APT spot',min:200,max:6000,step:25,unit:'USD/mtu',sub:t('slAPTSub'),color:'var(--gold)'},
+    {key:'concRealisation',label:t('slConc'),min:40,max:95,step:1,unit:'%',sub:t('slConcSub'),color:'#a78540'},
   ],
   prod:[
-    {key:'mtCarbine',label:'Mt Carbine (AUS)',min:200,max:4000,step:50,unit:'t WO3/a',sub:'Nyt ~1 200 → tavoite ~1 750 t',color:'var(--blue)'},
-    {key:'barruecopardo',label:'Barruecopardo (ESP)',min:500,max:3500,step:50,unit:'t WO3/a',sub:'Kapasiteetti ~1 600 t/a',color:'#38bdf8'},
-    {key:'recoveryRate',label:'Recovery rate',min:50,max:98,step:1,unit:'%',sub:'Nyt ~78% → APT-laitos 95%',color:'#3b82f6'},
+    {key:'mtCarbine',label:'Mt Carbine (AUS)',min:200,max:4000,step:50,unit:'t WO3/a',sub:t('slMcSub'),color:'var(--blue)'},
+    {key:'barruecopardo',label:'Barruecopardo (ESP)',min:500,max:3500,step:50,unit:'t WO3/a',sub:t('slBrSub'),color:'#38bdf8'},
+    {key:'recoveryRate',label:'Recovery rate',min:50,max:98,step:1,unit:'%',sub:t('slRecSub'),color:'#3b82f6'},
   ],
   cost:[
-    {key:'c1Cost',label:'C1 cash cost',min:80,max:500,step:5,unit:'USD/mtu',sub:'Suorat tuotantokulut',color:'var(--red)'},
-    {key:'aisc',label:'AISC',min:120,max:600,step:5,unit:'USD/mtu',sub:'All-in sustaining cost',color:'#ef4444'},
-    {key:'corpOverhead',label:'Yleiskulut',min:5,max:40,step:0.5,unit:'M USD',sub:'Corporate overhead',color:'#dc2626'},
-    {key:'da',label:'D&A poistot',min:5,max:50,step:0.5,unit:'M USD',sub:'Depreciation & amortisation',color:'#b91c1c'},
+    {key:'c1Cost',label:'C1 cash cost',min:80,max:500,step:5,unit:'USD/mtu',sub:t('slC1Sub'),color:'var(--red)'},
+    {key:'aisc',label:'AISC',min:120,max:600,step:5,unit:'USD/mtu',sub:t('slAiscSub'),color:'#ef4444'},
+    {key:'corpOverhead',label:t('slOH'),min:5,max:40,step:0.5,unit:'M USD',sub:t('slOHSub'),color:'#dc2626'},
+    {key:'da',label:'D&A',min:5,max:50,step:0.5,unit:'M USD',sub:t('slDASub'),color:'#b91c1c'},
   ],
   fin:[
-    {key:'sharesOut',label:'Osakkeet',min:1000,max:7000,step:50,unit:'milj.',sub:'~4 800M (3/2026)',color:'var(--green)'},
-    {key:'netDebt',label:'Netto velka',min:0,max:200,step:2,unit:'M USD',sub:'Velka − kassa',color:'#10b981'},
-    {key:'evMultiple',label:'EV/EBITDA',min:3,max:20,step:0.5,unit:'x',sub:'Vertaiskerroin',color:'#059669'},
-    {key:'peMultiple',label:'P/E',min:5,max:40,step:0.5,unit:'x',sub:'P/E-kerroin',color:'#047857'},
-    {key:'audUsd',label:'AUD/USD',min:0.55,max:0.80,step:0.005,unit:'kurssi',sub:'~0.700 (3/2026)',color:'#6ee7b7'},
+    {key:'sharesOut',label:t('slShares'),min:1000,max:7000,step:50,unit:{fi:'milj.',en:'M'}[LANG],sub:t('slSharesSub'),color:'var(--green)'},
+    {key:'netDebt',label:t('slDebt'),min:0,max:200,step:2,unit:'M USD',sub:t('slDebtSub'),color:'#10b981'},
+    {key:'evMultiple',label:'EV/EBITDA',min:3,max:20,step:0.5,unit:'x',sub:t('slEVSub'),color:'#059669'},
+    {key:'peMultiple',label:'P/E',min:5,max:40,step:0.5,unit:'x',sub:t('slPESub'),color:'#047857'},
+    {key:'audUsd',label:'AUD/USD',min:0.55,max:0.80,step:0.005,unit:{fi:'kurssi',en:'rate'}[LANG],sub:t('slFXSub'),color:'#6ee7b7'},
   ],
   dcf:[
-    {key:'wacc',label:'WACC',min:6,max:20,step:0.5,unit:'%',sub:'Painotettu pääomakustannus',color:'var(--cyan)'},
-    {key:'terminalGrowth',label:'Terminaalikasvu',min:0,max:4,step:0.25,unit:'%',sub:'Ikuinen kasvuoletus',color:'#06b6d4'},
-    {key:'capex',label:'Capex',min:2,max:50,step:1,unit:'M USD',sub:'Vuotuiset investoinnit',color:'#0891b2'},
-    {key:'nwcPct',label:'NWC % liikevaihdosta',min:0,max:15,step:0.5,unit:'%',sub:'Käyttöpääoman osuus',color:'#0e7490'},
+    {key:'wacc',label:'WACC',min:6,max:20,step:0.5,unit:'%',sub:t('slWaccSub'),color:'var(--cyan)'},
+    {key:'terminalGrowth',label:t('slTermGrowth'),min:0,max:4,step:0.25,unit:'%',sub:t('slTermSub'),color:'#06b6d4'},
+    {key:'capex',label:'Capex',min:2,max:50,step:1,unit:'M USD',sub:t('slCapexSub'),color:'#0891b2'},
+    {key:'nwcPct',label:t('slNwc'),min:0,max:15,step:0.5,unit:'%',sub:t('slNwcSub'),color:'#0e7490'},
   ],
-};
+}; }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FORMATTERS & HELPERS
@@ -479,7 +619,7 @@ function markCustom(){
 }
 function buildSliders(group,containerId){
   const el=document.getElementById(containerId); el.innerHTML='';
-  SLIDERS[group].forEach(cfg=>{
+  getSliders()[group].forEach(cfg=>{
     const pct=((V[cfg.key]-cfg.min)/(cfg.max-cfg.min))*100;
     const row=document.createElement('div'); row.className='slider-row';
     row.innerHTML=`<div class="slider-header"><span class="slider-label">${cfg.label}</span><span class="slider-value" id="sv-${cfg.key}" style="color:${cfg.color}">${fmtSV(V[cfg.key],cfg.unit)}</span></div>
@@ -529,9 +669,9 @@ function runMonteCarlo(){
 
   document.getElementById('mc-stats').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
-      ${kpi('Mediaani (P50)',fA(p50),'50% todennäköisyys','var(--gold)',false)}
-      ${kpi('Keskiarvo',fA(mean),'5 000 ajoa','var(--cyan)',false)}
-      ${kpi('Yli A$'+fi(SP,3),fi(pAbove,0)+'%','Todennäk. nousua','var(--green)',false)}
+      ${kpi(t('median'),fA(p50),'50% '+{fi:'todennäköisyys',en:'probability'}[LANG],'var(--gold)',false)}
+      ${kpi(t('mean'),fA(mean),t('mcRuns'),'var(--cyan)',false)}
+      ${kpi({fi:'Yli',en:'Above'}[LANG]+' A$'+fi(SP,3),fi(pAbove,0)+'%',t('mcAbove'),'var(--green)',false)}
     </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
       ${[['P10',p10,'var(--red)'],['P25',p25,'var(--orange)'],['P50',p50,'var(--gold)'],['P75',p75,'var(--green)'],['P90',p90,'var(--cyan)']].map(([l,v,c])=>`<div style="text-align:center;"><div style="font-size:9px;color:var(--text-muted);">${l}</div><div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${c};">${fA(v)}</div></div>`).join('')}
@@ -565,7 +705,7 @@ function runMonteCarlo(){
   ctx.strokeStyle='#f87171'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(spX,pad.t); ctx.lineTo(spX,pad.t+ch); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='#f87171'; ctx.font='9px IBM Plex Mono'; ctx.fillText('Kurssi',spX+3,pad.t+12);
+  ctx.fillStyle='#f87171'; ctx.font='9px IBM Plex Mono'; ctx.fillText(t('mcCourse'),spX+3,pad.t+12);
   // P50 line
   const p50X=pad.l+((p50-minV)/(maxV-minV))*cw;
   ctx.strokeStyle='var(--gold)'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
@@ -588,13 +728,13 @@ function render(){
   const r=calc(V), dcf=calcDCF(V);
   const pos=v=>v>0?'var(--green)':'var(--red)';
   const total=V.mtCarbine+V.barruecopardo;
-  const scLabel=total<2500?'⚠ Alle 3kt':total<3000?'📍 Alaraja':total<4000?'✅ 3–4 kt':total<5500?'🚀 Tuplaus':'🔭 Bull';
+  const scLabel=total<2500?t('prodBelow'):total<3000?t('prodLow'):total<4000?t('prodMid'):total<5500?t('prodHigh'):t('prodBull');
 
   // KPIs
   document.getElementById('kpi-top').innerHTML=
-    kpi(t('kpiRevenue'),fM(r.grossRev),'M USD / '+{fi:'vuosi',en:'year'}[LANG],'var(--gold)',true)+
-    kpi(t('kpiEBITDA'),fM(r.ebitda),{fi:'Marginaali',en:'Margin'}[LANG]+' '+fi(r.ebitdaMargin,1)+'%',pos(r.ebitda),true)+
-    kpi(t('kpiNI'),fM(r.ni),{fi:'Vero 30%',en:'Tax 30%'}[LANG],pos(r.ni),true);
+    kpi(t('kpiRevenue'),fM(r.grossRev),'M USD / '+t('yearLabel'),'var(--gold)',true)+
+    kpi(t('kpiEBITDA'),fM(r.ebitda),t('marginLabel')+' '+fi(r.ebitdaMargin,1)+'%',pos(r.ebitda),true)+
+    kpi(t('kpiNI'),fM(r.ni),t('taxLabel'),pos(r.ni),true);
   document.getElementById('kpi-bot').innerHTML=
     kpi(t('kpiProd'),fi(total,0)+' t',scLabel,total>=3000?'var(--green)':'#f59e0b')+
     kpi(t('kpiEPS'),fU(r.eps,3),'A$'+fi(r.epsAUD,3),'var(--purple)')+
@@ -611,12 +751,12 @@ function render(){
   document.getElementById('sp-mktcap').textContent='A$'+fi(mcAUD,0)+'M';
   document.getElementById('sp-mktcap-usd').textContent='≈ US$'+fi(mcUSD,0)+'M';
   document.getElementById('sp-ev').textContent=pctF(uEV); document.getElementById('sp-ev').style.color=col(uEV);
-  document.getElementById('sp-ev-tgt').textContent='Tavoite '+fA(r.navAUD);
+  document.getElementById('sp-ev-tgt').textContent=t('target')+' '+fA(r.navAUD);
   document.getElementById('sp-dcf').textContent=pctF(uDCF); document.getElementById('sp-dcf').style.color=col(uDCF);
   document.getElementById('sp-dcf-tgt').textContent='DCF '+fA(dcf.perShareAUD);
   document.getElementById('sp-avg').textContent=pctF(uAvg); document.getElementById('sp-avg').style.color=col(uAvg);
-  document.getElementById('sp-avg-tgt').textContent='Tavoite '+fA(avgAll);
-  const wkLow=0.028,wkHigh=0.390,wPct=Math.max(0,Math.min(100,(sp-wkLow)/(wkHigh-wkLow)*100));
+  document.getElementById('sp-avg-tgt').textContent=t('target')+' '+fA(avgAll);
+  const wkLow=window._wkLow||0.028,wkHigh=window._wkHigh||0.390,wPct=Math.max(0,Math.min(100,(sp-wkLow)/(wkHigh-wkLow)*100));
   document.getElementById('sp-bar-fill').style.width=wPct+'%';
   document.getElementById('sp-bar-dot').style.left=wPct+'%';
 
@@ -624,10 +764,10 @@ function render(){
   const mcRev=r.grossRev*(V.mtCarbine/total), brRev=r.grossRev*(V.barruecopardo/total);
   const irows=[
     ['Mt Carbine ('+fi(V.mtCarbine,0)+' t)',mcRev,0,0,null],['Barruecopardo ('+fi(V.barruecopardo,0)+' t)',brRev,0,0,null],
-    ['Liikevaihto yhteensä',r.grossRev,1,0,'var(--gold)'],['AISC-kustannukset',-r.aiscTotal,0,1,null],
-    ['Bruttokate',r.grossProfit,1,0,pos(r.grossProfit)],['Yleiskulut',-V.corpOverhead,0,1,null],
-    ['EBITDA',r.ebitda,1,0,pos(r.ebitda)],['D&A',-V.da,0,1,null],['EBIT',r.ebit,1,0,null],
-    ['Vero (30%)',-r.tax,0,1,null],['Nettotulos',r.ni,1,0,pos(r.ni)],
+    [t('isRevTotal'),r.grossRev,1,0,'var(--gold)'],[t('isAISC'),-r.aiscTotal,0,1,null],
+    [t('isGross'),r.grossProfit,1,0,pos(r.grossProfit)],[t('isOverhead'),-V.corpOverhead,0,1,null],
+    ['EBITDA',r.ebitda,1,0,pos(r.ebitda)],[t('isDA'),-V.da,0,1,null],['EBIT',r.ebit,1,0,null],
+    [t('isTax'),-r.tax,0,1,null],[t('isNI'),r.ni,1,0,pos(r.ni)],
   ];
   document.getElementById('income').innerHTML=irows.map(([l,v,b,i,c])=>{
     const color=c||(v<0?'var(--red)':'var(--text)');
@@ -635,8 +775,8 @@ function render(){
   }).join('');
 
   document.getElementById('margins').innerHTML=[
-    ['Bruttokate',r.cashMargin,'var(--gold)'],['EBITDA',r.ebitdaMargin,'var(--green)'],['Netto',r.netMargin,'var(--purple)'],
-  ].map(([n,p,c])=>`<div class="mrow"><div class="mhdr"><span class="mname">${n}-marginaali</span><span class="mpct" style="color:${c}">${fi(p,1)}%</span></div><div class="btrack"><div class="bfill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></div></div></div>`).join('')+
+    [t('mGross'),r.cashMargin,'var(--gold)'],[t('mEBITDA'),r.ebitdaMargin,'var(--green)'],[t('mNet'),r.netMargin,'var(--purple)'],
+  ].map(([n,p,c])=>`<div class="mrow"><div class="mhdr"><span class="mname">${n}</span><span class="mpct" style="color:${c}">${fi(p,1)}%</span></div><div class="btrack"><div class="bfill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></div></div></div>`).join('')+
   `<div class="mrow"><div class="mhdr"><span class="mname">APT spread</span><span class="mpct" style="color:${r.spread>=0?'var(--green)':'var(--red)'}">$${fi(r.spread,0)}/mtu</span></div></div>`;
 
   // Sensitivity
@@ -655,26 +795,26 @@ function render(){
   // Valuation bridge
   document.getElementById('bridge').innerHTML=[
     [`EBITDA $${fi(r.ebitda,1)}M × ${V.evMultiple}x = EV`,fM(r.ev),0,'var(--blue)'],
-    ['− Netto velka',fM(-V.netDebt),0,'var(--red)'],
-    ['= Equity (M USD)',fM(r.equity),1,'var(--gold)'],
-    ['EV/EBITDA → A$/osake',fA(r.navAUD),1,'var(--gold)'],
-    [`P/E ${V.peMultiple}x → A$/osake`,fA(r.peAUD),1,'var(--purple)'],
-    ['DCF → A$/osake',fA(dcf.perShareAUD),1,'var(--cyan)'],
-    ['Avg. tavoite (3 mallia)',fA(avgAll),1,'var(--green)'],
+    [t('brNetDebt'),fM(-V.netDebt),0,'var(--red)'],
+    [t('brEquity'),fM(r.equity),1,'var(--gold)'],
+    ['EV/EBITDA → A$/'+{fi:'osake',en:'share'}[LANG],fA(r.navAUD),1,'var(--gold)'],
+    [`P/E ${V.peMultiple}x → A$/`+{fi:'osake',en:'share'}[LANG],fA(r.peAUD),1,'var(--purple)'],
+    ['DCF → A$/'+{fi:'osake',en:'share'}[LANG],fA(dcf.perShareAUD),1,'var(--cyan)'],
+    [t('brAvg'),fA(avgAll),1,'var(--green)'],
   ].map(([l,v,b,c])=>`<div class="brow${b?' bold':''}"><span class="bl">${l}</span><span class="bv" style="color:${c}">${v}</span></div>`).join('');
 
   // ── DCF TAB ──
   let dcfH='<div style="margin-bottom:14px;">';
-  dcfH+=`<table class="stbl"><thead><tr><th>Vuosi</th><th>FCF (M$)</th><th>PV (M$)</th></tr></thead><tbody>`;
+  dcfH+=`<table class="stbl"><thead><tr><th>${t('dcfYear')}</th><th>FCF (M$)</th><th>PV (M$)</th></tr></thead><tbody>`;
   dcf.fcfs.forEach(f=>{dcfH+=`<tr><td>${f.year}</td><td>${fi(f.fcf,1)}</td><td>${fi(f.pv,1)}</td></tr>`;});
   dcfH+='</tbody></table></div>';
-  dcfH+=`<div class="irow bold"><span class="il">PV kassavirroista</span><span class="iv" style="color:var(--cyan)">${fM(dcf.pvFCF)}</span></div>`;
-  dcfH+=`<div class="irow"><span class="il">Terminaaliarvo (PV)</span><span class="iv">${fM(dcf.pvTV)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">${t('dcfPVcf')}</span><span class="iv" style="color:var(--cyan)">${fM(dcf.pvFCF)}</span></div>`;
+  dcfH+=`<div class="irow"><span class="il">${t('dcfTV')}</span><span class="iv">${fM(dcf.pvTV)}</span></div>`;
   dcfH+=`<div class="irow bold"><span class="il">Enterprise Value</span><span class="iv" style="color:var(--gold)">${fM(dcf.ev)}</span></div>`;
-  dcfH+=`<div class="irow"><span class="il">− Netto velka</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
-  dcfH+=`<div class="irow bold"><span class="il">Equity Value</span><span class="iv" style="color:var(--green)">${fM(dcf.eqValue)}</span></div>`;
-  dcfH+=`<div class="irow bold"><span class="il">DCF / osake (A$)</span><span class="iv" style="color:var(--cyan);font-size:16px;">${fA(dcf.perShareAUD)}</span></div>`;
-  dcfH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">TV osuus EV:stä: ${fi(dcf.pvTV/dcf.ev*100,0)}% | WACC ${V.wacc}% | g ${V.terminalGrowth}%</div>`;
+  dcfH+=`<div class="irow"><span class="il">${t('brNetDebt')}</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">${t('dcfEqVal')}</span><span class="iv" style="color:var(--green)">${fM(dcf.eqValue)}</span></div>`;
+  dcfH+=`<div class="irow bold"><span class="il">${t('dcfPerShare')}</span><span class="iv" style="color:var(--cyan);font-size:16px;">${fA(dcf.perShareAUD)}</span></div>`;
+  dcfH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">${t('dcfTVshare')}: ${fi(dcf.pvTV/dcf.ev*100,0)}% | WACC ${V.wacc}% | g ${V.terminalGrowth}%</div>`;
   document.getElementById('dcf-detail').innerHTML=dcfH;
 
   // DCF sensitivity
@@ -694,44 +834,44 @@ function render(){
   const revPerAPT=(V.concRealisation/100)*total*100/1e6*(V.recoveryRate/100);
   const fullBE=totalCostM/revPerAPT;
   let beH=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
-    ${kpi('Mt Carbine BE','$'+fi(mcBE,0)+'/mtu','APT hinta jossa nolla','var(--blue)',false)}
-    ${kpi('Barruecopardo BE','$'+fi(brBE,0)+'/mtu','APT hinta jossa nolla','#38bdf8',false)}
-    ${kpi('Koko yhtiö BE','$'+fi(fullBE,0)+'/mtu','Sis. overhead + D&A','var(--gold)',false)}
+    ${kpi(t('beMtCarbine'),'$'+fi(mcBE,0)+'/mtu',t('beAPTzero'),'var(--blue)',false)}
+    ${kpi(t('beBarr'),'$'+fi(brBE,0)+'/mtu',t('beAPTzero'),'#38bdf8',false)}
+    ${kpi(t('beTotal'),'$'+fi(fullBE,0)+'/mtu',t('beInclOH'),'var(--gold)',false)}
   </div>`;
   // Visual bar
   const beMax=Math.max(V.aptPrice*1.2,fullBE*1.3,3000);
   const barPct=v=>Math.min(100,v/beMax*100);
   beH+='<div style="margin-bottom:16px;">';
-  [[`Mt Carbine AISC: $${V.mcAisc}/mtu`,mcBE,'var(--blue)'],[`Barruecopardo AISC: $${V.brAisc}/mtu`,brBE,'#38bdf8'],['Yhtiö kokonais-BE',fullBE,'var(--gold)'],['APT spot-hinta',V.aptPrice,'var(--green)']].forEach(([l,v,c])=>{
+  [[`Mt Carbine AISC: $${V.mcAisc}/mtu`,mcBE,'var(--blue)'],[`Barruecopardo AISC: $${V.brAisc}/mtu`,brBE,'#38bdf8'],[t('beTotal'),fullBE,'var(--gold)'],['APT spot',V.aptPrice,'var(--green)']].forEach(([l,v,c])=>{
     beH+=`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:3px;"><span>${l}</span><span style="color:${c};font-family:var(--mono);font-weight:700;">$${fi(v,0)}/mtu</span></div>
     <div class="btrack"><div class="bfill" style="width:${barPct(v)}%;background:${c};"></div></div></div>`;
   });
   beH+='</div>';
   beH+=`<div style="font-size:10px;color:var(--text-dim);line-height:1.6;">
-    <b>Turvamarginaali:</b> APT-hinta ($${fi(V.aptPrice,0)}) on <span style="color:var(--green);font-weight:700;">${fi((V.aptPrice-fullBE)/fullBE*100,0)}%</span> yli kokonais-breakeven-tason.<br>
-    Mt Carbine on kannattava kun APT > $${fi(mcBE,0)}/mtu | Barruecopardo kun APT > $${fi(brBE,0)}/mtu
+    <b>${t('safetyMargin')}:</b> APT ($${fi(V.aptPrice,0)}) ${LANG==='fi'?'on':'is'} <span style="color:var(--green);font-weight:700;">${fi((V.aptPrice-fullBE)/fullBE*100,0)}%</span> ${t('beAbove')}.<br>
+    Mt Carbine ${t('beProfitable')} $${fi(mcBE,0)}/mtu | Barruecopardo ${LANG==='fi'?'kun':'when'} APT > $${fi(brBE,0)}/mtu
   </div>`;
   document.getElementById('breakeven-detail').innerHTML=beH;
 
   // ── PEERS TAB ──
   const peers=[
-    {name:'Almonty (AII.TO / ALM)',evEbitda:'–*',ps:'169x',mktcap:'C$6,5B / $4,2B',status:'Sangdong (Korea) ramp-up, Panasqueira (Portugal), Gentung (USA)',note:'Lähin vertailukohta'},
-    {name:'American Tungsten (TUNGF)',evEbitda:'–',ps:'–',mktcap:'Pre-revenue',status:'Lost Creek (USA) exploraatio',note:'Spekulatiivinen'},
-    {name:'China Molybdenum (CMOC)',evEbitda:'~8x',ps:'~2x',mktcap:'~$18B',status:'Diversifioitu (W, Mo, Co, Cu)',note:'Kiina-vertailu'},
-    {name:'Wolf Minerals',evEbitda:'–',ps:'–',mktcap:'Konkurssi 2018',status:'Drakelands (UK) suljettu',note:'Varoittava esimerkki'},
-    {name:'Ormonde Mining',evEbitda:'–',ps:'–',mktcap:'~€15M (hist.)',status:'Barruecopardo → myyty EQR:lle',note:'Historiallinen'},
-    {name:'EQR (tämä malli)',evEbitda:fi(V.evMultiple,1)+'x',ps:fi(SP*V.sharesOut*V.audUsd/r.grossRev,1)+'x',mktcap:'A$'+fi(SP*V.sharesOut,0)+'M',status:'Mt Carbine + Barruecopardo',note:'Nykyinen'},
+    {name:'Almonty (AII.TO / ALM)',evEbitda:'–*',ps:'169x',mktcap:'C$6,5B / $4,2B',status:t('peerRampup'),note:t('peerAlmontyNote')},
+    {name:'American Tungsten (TUNGF)',evEbitda:'–',ps:'–',mktcap:t('peerPreRev'),status:t('peerLostCreek'),note:t('peerSpec')},
+    {name:'China Molybdenum (CMOC)',evEbitda:'~8x',ps:'~2x',mktcap:'~$18B',status:t('peerDiversified'),note:t('peerChinaNote')},
+    {name:'Wolf Minerals',evEbitda:'–',ps:'–',mktcap:t('peerBankrupt'),status:t('peerWolf'),note:t('peerWolfNote')},
+    {name:'Ormonde Mining',evEbitda:'–',ps:'–',mktcap:'~€15M (hist.)',status:t('peerOrmonde'),note:t('peerHistNote')},
+    {name:'EQR ('+{fi:'tämä malli',en:'this model'}[LANG]+')',evEbitda:fi(V.evMultiple,1)+'x',ps:fi(SP*V.sharesOut*V.audUsd/r.grossRev,1)+'x',mktcap:'A$'+fi(SP*V.sharesOut,0)+'M',status:'Mt Carbine + Barruecopardo',note:t('peerCurrentNote')},
   ];
-  let peerH=`<table class="ptbl"><thead><tr><th>Yhtiö</th><th>EV/EBITDA</th><th>P/S</th><th>Mkt Cap</th><th>Status</th></tr></thead><tbody>`;
+  let peerH=`<table class="ptbl"><thead><tr><th>${t('peerCompany')}</th><th>EV/EBITDA</th><th>P/S</th><th>Mkt Cap</th><th>${t('peerStatus')}</th></tr></thead><tbody>`;
   peers.forEach(p=>{
     const hl=p.name.includes('EQR')?'hl':'';
     peerH+=`<tr class="${hl}"><td>${p.name}</td><td>${p.evEbitda}</td><td>${p.ps}</td><td>${p.mktcap}</td><td style="font-size:9px;">${p.status}</td></tr>`;
   });
   peerH+='</tbody></table>';
   peerH+=`<div style="font-size:9px;color:#4b5563;margin-top:10px;line-height:1.6;">
-    <b>Almonty</b> on selkeästi lähin vertailukohta — ainoa merkittävä ei-kiinalainen tungsten-tuottaja. Mkt cap C$6,5B (3/2026) vs. EQR A$1,6B. Almonty on pre-profit (TTM tappio -$65M), P/S 169x vs. EQR:n forward-mallin P/S. Sangdong-kaivoksen (Korea) tuotannon käynnistyminen on avaintekijä.<br>
-    <b>*</b> Almonty on vielä tappiollinen (EPS -$0.33 TTM) joten EV/EBITDA ei ole mielekäs. Arvostus perustuu Sangdong-optioarvoon.<br>
-    Wolf Minerals (Drakelands) meni konkurssiin 2018 kustannusylitysten vuoksi — muistutus operatiivisista riskeistä.</div>`;
+    <b>Almonty</b> ${t('peerAlmontyDesc')}<br>
+    <b>*</b> ${t('peerAlmontyEV')}<br>
+    ${t('peerWolfWarn')}</div>`;
   document.getElementById('peer-detail').innerHTML=peerH;
 
   // ── NAV TAB (Sum-of-the-Parts) ──
@@ -744,9 +884,9 @@ function render(){
   const navPerShare=totalNAV/V.sharesOut/V.audUsd;
   let navH=`<div class="irow"><span class="il">Mt Carbine (EBITDA $${fi(mcEbitda,1)}M × ${V.evMultiple}x)</span><span class="iv" style="color:var(--blue)">${fM(mcNAV)}</span></div>`;
   navH+=`<div class="irow"><span class="il">Barruecopardo (EBITDA $${fi(brEbitda,1)}M × ${V.evMultiple}x)</span><span class="iv" style="color:#38bdf8">${fM(brNAV)}</span></div>`;
-  navH+=`<div class="irow"><span class="il">− Netto velka</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
-  navH+=`<div class="irow bold"><span class="il">Kokonais-NAV</span><span class="iv" style="color:var(--gold)">${fM(totalNAV)}</span></div>`;
-  navH+=`<div class="irow bold"><span class="il">NAV / osake (A$)</span><span class="iv" style="color:var(--gold);font-size:16px;">${fA(navPerShare)}</span></div>`;
+  navH+=`<div class="irow"><span class="il">${t('brNetDebt')}</span><span class="iv" style="color:var(--red)">${fM(-V.netDebt)}</span></div>`;
+  navH+=`<div class="irow bold"><span class="il">${t('navTotal')}</span><span class="iv" style="color:var(--gold)">${fM(totalNAV)}</span></div>`;
+  navH+=`<div class="irow bold"><span class="il">${t('navPerShare')}</span><span class="iv" style="color:var(--gold);font-size:16px;">${fA(navPerShare)}</span></div>`;
   // Pie-style breakdown
   const mcPct=mcNAV/(mcNAV+brNAV)*100, brPct=100-mcPct;
   navH+=`<div style="margin-top:14px;"><div style="display:flex;height:16px;border-radius:4px;overflow:hidden;">
@@ -774,14 +914,35 @@ function render(){
     const eps2=ni2/V.sharesOut;
     tlRows.push({y,apt:aptPath[i],prod:t2,rec:recPath[i],rev,ebitda:ebitda2,ni:ni2,eps:eps2});
   });
-  [['APT ($/mtu)',r=>fi(r.apt,0)],['Tuotanto (t WO3)',r=>fi(r.prod,0)],['Recovery (%)',r=>fi(r.rec,0)+'%'],
-   ['Liikevaihto (M$)',r=>fi(r.rev,1)],['EBITDA (M$)',r=>fi(r.ebitda,1)],['Nettotulos (M$)',r=>fi(r.ni,1)],
-   ['EPS (USD)',r=>fU(r.eps,3)]].forEach(([l,fn])=>{
+  [[t('tlAPT'),r=>fi(r.apt,0)],[t('tlProd'),r=>fi(r.prod,0)],[t('tlRecovery'),r=>fi(r.rec,0)+'%'],
+   [t('tlRev'),r=>fi(r.rev,1)],[t('tlEBITDA'),r=>fi(r.ebitda,1)],[t('tlNI'),r=>fi(r.ni,1)],
+   [t('tlEPS'),r=>fU(r.eps,3)]].forEach(([l,fn])=>{
     tlH+=`<tr><td>${l}</td>${tlRows.map(r=>`<td>${fn(r)}</td>`).join('')}</tr>`;
   });
   tlH+='</tbody></table>';
-  tlH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">Oletukset: APT laskee 3–5%/v (mean-reversion), tuotanto kasvaa ramp-up-suunnitelman mukaan, recovery nousee vaiheittain. Muut parametrit pysyvät vakiona.</div>`;
+  tlH+=`<div style="font-size:9px;color:#4b5563;margin-top:8px;">${t('tlNote')}</div>`;
   document.getElementById('timeline-detail').innerHTML=tlH;
+
+  // Update dynamic text labels
+  if(document.getElementById('sens-note')) document.getElementById('sens-note').textContent=t('sensNote');
+  if(document.getElementById('mc-note')) document.getElementById('mc-note').textContent=t('mcNote');
+  if(document.getElementById('disclaimer-text')) document.getElementById('disclaimer-text').innerHTML=t('disclaimer1')+'<br>'+t('disclaimer2');
+
+  // Update card titles
+  const cardTitles = [
+    ['tc-core', [t('cIncome'), t('cMargins'), t('cSens'), t('cBridge')]],
+    ['tc-dcf', [t('cDCF'), t('cDCFsens')]],
+    ['tc-breakeven', [t('cBreakeven')]],
+    ['tc-peers', [t('cPeers')]],
+    ['tc-nav', [t('cNAV')]],
+    ['tc-timeline', [t('cTimeline')]],
+    ['tc-mc', [t('cMC')]],
+    ['tc-actuals', [t('cActuals'), t('cConfig')]],
+  ];
+  cardTitles.forEach(([tabId, titles]) => {
+    const cards = document.querySelectorAll('#'+tabId+' .card-title');
+    titles.forEach((title, i) => { if(cards[i]) cards[i].textContent = title; });
+  });
 
   // Auto-update Monte Carlo if its tab is visible
   if(document.getElementById('tc-mc').classList.contains('active')) runMonteCarlo();
@@ -798,7 +959,7 @@ let LIVE_DATA = { sharePrice:null, audUsd:null, configLoaded:false, config:null,
 // Yahoo Finance via CORS proxy (allorigins)
 async function fetchLivePrice() {
   const status = document.getElementById('live-status');
-  status.innerHTML = '⏳ Haetaan live-dataa...';
+  status.innerHTML = t('liveLoading');
   try {
     // EQR.AX share price
     const eqrUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/EQR.AX?interval=1d&range=1d';
@@ -806,7 +967,9 @@ async function fetchLivePrice() {
     const eqrResp = await fetch(eqrProxy); 
     if(eqrResp.ok) {
       const eqrData = await eqrResp.json();
-      const price = eqrData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      const meta = eqrData?.chart?.result?.[0]?.meta;
+      const price = meta?.regularMarketPrice || meta?.previousClose || 
+        (eqrData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null)?.pop());
       if(price && price > 0) { LIVE_DATA.sharePrice = price; }
     }
   } catch(e) { LIVE_DATA.errors.push('EQR: '+e.message); }
@@ -818,7 +981,9 @@ async function fetchLivePrice() {
     const fxResp = await fetch(fxProxy);
     if(fxResp.ok) {
       const fxData = await fxResp.json();
-      const rate = fxData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      const fxMeta = fxData?.chart?.result?.[0]?.meta;
+      const rate = fxMeta?.regularMarketPrice || fxMeta?.previousClose ||
+        (fxData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null)?.pop());
       if(rate && rate > 0) { LIVE_DATA.audUsd = rate; }
     }
   } catch(e) { LIVE_DATA.errors.push('FX: '+e.message); }
@@ -840,7 +1005,7 @@ async function fetchLivePrice() {
     status.innerHTML = '🟢 Live: ' + parts.join(' | ');
     status.style.color = 'var(--green)';
   } else {
-    status.innerHTML = '🔴 Live-data ei saatavilla';
+    status.innerHTML = t('liveFail');
     status.style.color = 'var(--red)';
   }
 
@@ -899,17 +1064,16 @@ function renderActuals() {
   const r = calc(V);
   
   if(!cfg || !cfg.actuals) {
-    document.getElementById('actuals-detail').innerHTML = '<div style="color:var(--text-muted);font-size:11px;">Config.json ei ladattu tai toteumatietoja ei löydy.</div>';
+    document.getElementById('actuals-detail').innerHTML = '<div style="color:var(--text-muted);font-size:11px;">'+t('actNoData')+'</div>';
     document.getElementById('config-detail').innerHTML = '';
     return;
   }
 
-  // Build actuals vs forecast comparison
   let ah = '';
   const periods = Object.entries(cfg.actuals);
   
   if(periods.length === 0) {
-    ah = '<div style="color:var(--text-muted);font-size:11px;">Ei toteumatietoja vielä. Päivitä config.json tulosjulkistuksen jälkeen.</div>';
+    ah = '<div style="color:var(--text-muted);font-size:11px;">'+t('actNoActuals')+'</div>';
   } else {
     ah += '<div style="margin-bottom:12px;">';
     periods.forEach(([key, act]) => {
@@ -917,10 +1081,10 @@ function renderActuals() {
       ah += `<div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">${key} — ${act.period || ''}</div>`;
       
       const rows = [
-        ['Liikevaihto (A$M)', act.revenueAUD, r.grossRev / V.audUsd],
-        ['EBITDA (A$M)', act.ebitdaAUD, r.ebitda / V.audUsd],
-        ['Nettotulos (A$M)', act.netIncomeAUD, r.ni / V.audUsd],
-        ['EPS (A$)', act.epsAUD, r.eps / V.audUsd],
+        [t('actRevenue'), act.revenueAUD, r.grossRev / V.audUsd],
+        [t('actEBITDA'), act.ebitdaAUD, r.ebitda / V.audUsd],
+        [t('actNI'), act.netIncomeAUD, r.ni / V.audUsd],
+        [t('actEPS'), act.epsAUD, r.eps / V.audUsd],
       ];
       
       rows.forEach(([label, actual, forecast]) => {
@@ -940,26 +1104,26 @@ function renderActuals() {
       });
       
       ah += `<div style="display:grid;grid-template-columns:1fr 80px 80px 60px;padding:3px 0;font-size:9px;color:#4b5563;border-bottom:1px solid var(--border);margin-bottom:4px;">
-        <span></span><span style="text-align:right;">Toteuma</span><span style="text-align:right;">Ennuste*</span><span style="text-align:right;">Ero</span></div>`;
+        <span></span><span style="text-align:right;">${t('actActual')}</span><span style="text-align:right;">${t('actForecast')}</span><span style="text-align:right;">${t('actDiff')}</span></div>`;
       
       if(act.notes) ah += `<div style="font-size:9px;color:#4b5563;margin-top:6px;">📝 ${act.notes}</div>`;
       ah += '</div>';
     });
     ah += '</div>';
-    ah += `<div style="font-size:9px;color:#4b5563;">* Ennuste = mallin nykyinen vuositasoinen ennuste muutettuna AUD:ksi. Toteumat ovat raportointikauden lukuja.<br>Päivitä toteumat: muokkaa <a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);">config.json</a> GitHubissa.</div>`;
+    ah += `<div style="font-size:9px;color:#4b5563;">${t('actFootnote')}<br>${t('actUpdate')} <a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);">config.json</a> ${LANG==='fi'?'GitHubissa':'on GitHub'}.</div>`;
   }
   document.getElementById('actuals-detail').innerHTML = ah;
 
   // Config details
   let ch = `<div style="font-size:10px;color:var(--text-dim);line-height:1.8;">`;
-  ch += `<b>Viimeisin päivitys:</b> ${cfg.lastUpdated || '—'} (${cfg.lastUpdatedBy || '—'})<br>`;
+  ch += `<b>${t('actLastUpdate')}:</b> ${cfg.lastUpdated || '—'} (${cfg.lastUpdatedBy || '—'})<br>`;
   if(cfg.market) {
     const m = cfg.market;
-    ch += `<b>Config-arvot:</b> APT $${m.aptPrice||'—'}/mtu, kurssi A$${m.sharePrice||'—'}, osakkeet ${m.sharesOut||'—'}M, AUD/USD ${m.audUsd||'—'}<br>`;
+    ch += `<b>${t('actConfigVals')}:</b> APT $${m.aptPrice||'—'}/mtu, ${LANG==='fi'?'kurssi':'price'} A$${m.sharePrice||'—'}, ${LANG==='fi'?'osakkeet':'shares'} ${m.sharesOut||'—'}M, AUD/USD ${m.audUsd||'—'}<br>`;
   }
-  ch += `<b>Live-data:</b> ${LIVE_DATA.sharePrice ? 'EQR A$'+LIVE_DATA.sharePrice.toFixed(3) : 'ei saatavilla'} | ${LIVE_DATA.audUsd ? 'AUD/USD '+LIVE_DATA.audUsd.toFixed(3) : 'ei saatavilla'}<br>`;
-  if(LIVE_DATA.errors.length > 0) ch += `<b>Virheet:</b> ${LIVE_DATA.errors.join(', ')}<br>`;
-  ch += `<br><a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);text-decoration:underline;">✏️ Muokkaa config.json GitHubissa</a>`;
+  ch += `<b>${t('actLiveData')}:</b> ${LIVE_DATA.sharePrice ? 'EQR A$'+LIVE_DATA.sharePrice.toFixed(3) : t('actNotAvail')} | ${LIVE_DATA.audUsd ? 'AUD/USD '+LIVE_DATA.audUsd.toFixed(3) : t('actNotAvail')}<br>`;
+  if(LIVE_DATA.errors.length > 0) ch += `<b>${t('actErrors')}:</b> ${LIVE_DATA.errors.join(', ')}<br>`;
+  ch += `<br><a href="https://github.com/ricorokka/EQR-laskuri/edit/main/config.json" target="_blank" style="color:var(--cyan);text-decoration:underline;">${t('actEdit')}</a>`;
   ch += '</div>';
   document.getElementById('config-detail').innerHTML = ch;
 }
