@@ -135,6 +135,31 @@
   .slider-row .track-thumb { transition:transform .15s, box-shadow .15s; }
   /* Loading pulse */
   .loading-pulse { animation:pulse 1.5s infinite; }
+  /* ═══ HERO / ONBOARDING ═══ */
+  .hero { background:linear-gradient(180deg,#0a1628 0%,var(--bg) 100%); padding:32px 28px 0; text-align:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle,rgba(200,169,110,0.06) 0%,transparent 70%); pointer-events:none; }
+  .hero-tagline { font-size:26px; font-weight:700; color:#f3f4f6; letter-spacing:-0.02em; margin-bottom:6px; animation:fadeIn .5s ease; }
+  .hero-sub { font-size:13px; color:var(--text-muted); max-width:520px; margin:0 auto 20px; line-height:1.6; animation:fadeIn .6s ease .1s both; }
+  .hero-sub b { color:var(--gold); font-weight:600; }
+  .quick-play { display:flex; gap:20px; justify-content:center; align-items:stretch; flex-wrap:wrap; margin-bottom:24px; animation:fadeIn .6s ease .2s both; }
+  .qp-card { background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:18px 22px; min-width:220px; max-width:280px; flex:1; text-align:left; transition:border-color .2s, box-shadow .2s; }
+  .qp-card:hover { border-color:var(--gold); box-shadow:0 4px 20px rgba(200,169,110,0.1); }
+  .qp-label { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:6px; }
+  .qp-val { font-family:var(--mono); font-size:28px; font-weight:700; margin-bottom:4px; transition:color .2s; }
+  .qp-hint { font-size:10px; color:#4b5563; }
+  .qp-result { background:linear-gradient(135deg,rgba(200,169,110,0.08),rgba(52,211,153,0.08)); border:1px solid var(--border); border-radius:12px; padding:18px 28px; min-width:200px; max-width:280px; text-align:center; display:flex; flex-direction:column; justify-content:center; transition:all .3s; }
+  .qp-result-label { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:6px; }
+  .qp-result-val { font-family:var(--mono); font-size:36px; font-weight:700; color:var(--gold); transition:all .3s; }
+  .qp-result-sub { font-size:11px; color:var(--text-dim); margin-top:4px; }
+  .qp-slider { width:100%; margin:8px 0 0; cursor:pointer; accent-color:var(--gold); height:6px; }
+  .try-prompts { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; animation:fadeIn .6s ease .3s both; }
+  .try-btn { padding:8px 16px; background:var(--bg4); border:1px solid #374151; border-radius:20px; color:var(--text-dim); font-size:11px; cursor:pointer; font-family:var(--sans); transition:all .2s; white-space:nowrap; }
+  .try-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,169,110,0.06); transform:translateY(-1px); }
+  .hero-toggle { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:transparent; border:1px solid #374151; border-radius:16px; color:var(--text-muted); font-size:10px; cursor:pointer; font-family:var(--mono); transition:all .2s; margin-bottom:12px; animation:fadeIn .6s ease .4s both; }
+  .hero-toggle:hover { border-color:var(--text-muted); color:var(--text); }
+  @keyframes countUp { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+  .count-pop { animation:countUp .3s ease; }
+  @media(max-width:700px){ .quick-play{flex-direction:column;align-items:center;} .qp-card,.qp-result{max-width:100%;min-width:0;width:100%;} .hero-tagline{font-size:20px;} }
 </style>
 </head>
 <body>
@@ -153,7 +178,43 @@
   <div id="live-status" style="font-size:9px;font-family:var(--mono);color:#4b5563;text-align:right;line-height:1.4;"></div>
 </header>
 
-<div class="layout">
+<!-- ═══ HERO / QUICK PLAY ═══ -->
+<div class="hero" id="hero-section">
+  <div class="hero-tagline" id="hero-title">What if tungsten hits $3,500?</div>
+  <div class="hero-sub" id="hero-sub">EQR operates two tungsten mines with massive operating leverage. Drag the sliders to see how <b>APT price</b> and <b>production</b> affect shareholder value — in real time.</div>
+  
+  <div class="quick-play">
+    <div class="qp-card">
+      <div class="qp-label">APT Tungsten Price</div>
+      <div class="qp-val" id="qp-apt-val" style="color:var(--gold);">$2,160</div>
+      <div class="qp-hint">$/mtu — drag to explore</div>
+      <input type="range" class="qp-slider" id="qp-apt" min="500" max="5000" step="50" value="2160" oninput="quickPlay()">
+    </div>
+    <div class="qp-card">
+      <div class="qp-label">Total Production</div>
+      <div class="qp-val" id="qp-prod-val" style="color:var(--cyan);">3,000t</div>
+      <div class="qp-hint">WO3 tonnes/year</div>
+      <input type="range" class="qp-slider" id="qp-prod" min="1500" max="5500" step="100" value="3000" oninput="quickPlay()">
+    </div>
+    <div class="qp-result" id="qp-result">
+      <div class="qp-result-label" id="qp-result-label">Upside from A$0.34</div>
+      <div class="qp-result-val" id="qp-upside">+66%</div>
+      <div class="qp-result-sub" id="qp-target">Target A$0.57</div>
+    </div>
+  </div>
+
+  <div class="try-prompts" id="try-prompts">
+    <button class="try-btn" onclick="quickScenario(1200,2000)">🐻 Bear: APT crash to $1,200</button>
+    <button class="try-btn" onclick="quickScenario(3500,3500)">🚀 Bull: APT $3,500 + ramp-up</button>
+    <button class="try-btn" onclick="quickScenario(5000,4500)">🔭 Supercycle: APT $5,000</button>
+  </div>
+
+  <button class="hero-toggle" id="hero-toggle" onclick="toggleHero()">
+    <span id="hero-toggle-text">▼ Full model</span>
+  </button>
+</div>
+
+<div class="layout" id="main-layout">
   <div class="left-panel">
     <div class="section">
       <div class="section-title" style="color:var(--gold)">Skenaariot</div>
@@ -525,6 +586,7 @@ function setLang(lang) {
   const wkLabel = document.getElementById('sp-52wk-label');
   if(wkLabel) wkLabel.innerHTML = t('sp52wk') + ' <span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span>';
   render();
+  if(typeof updateHeroLang === 'function') updateHeroLang();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1235,13 +1297,113 @@ function renderActuals() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// HERO / QUICK PLAY
+// ═══════════════════════════════════════════════════════════════════════════
+let heroCollapsed = false;
+function quickPlay() {
+  const apt = parseInt(document.getElementById('qp-apt').value);
+  const prod = parseInt(document.getElementById('qp-prod').value);
+  document.getElementById('qp-apt-val').textContent = '$' + apt.toLocaleString('en-US');
+  document.getElementById('qp-prod-val').textContent = prod.toLocaleString('en-US') + 't';
+  // Quick calc
+  const concR = 75, rec = 78, aisc = 220, oh = 12, da = 15, shares = 4800, debt = 45, evm = 8, pe = 10, aud = 0.70;
+  const rp = apt * (concR/100);
+  const rev = (rp * prod * 100/1e6) * (rec/100);
+  const aiscT = aisc * prod * 100/1e6;
+  const ebitda = rev - aiscT - oh;
+  const ebit = ebitda - da;
+  const ni = ebit > 0 ? ebit * 0.70 : ebit;
+  const eps = ni / shares;
+  const ev = ebitda * evm;
+  const navAUD = (ev - debt) / shares / aud;
+  const peAUD = Math.max(eps,0) * pe / aud;
+  const avg = (navAUD + peAUD) / 2;
+  const sp = SP || 0.34;
+  const upside = avg > 0 && sp > 0 ? (avg - sp) / sp * 100 : 0;
+  
+  const el = document.getElementById('qp-upside');
+  el.textContent = (upside >= 0 ? '+' : '') + Math.round(upside) + '%';
+  el.style.color = upside >= 0 ? 'var(--green)' : 'var(--red)';
+  el.classList.remove('count-pop');
+  void el.offsetWidth;
+  el.classList.add('count-pop');
+  
+  document.getElementById('qp-target').textContent = (LANG==='fi'?'Tavoite':'Target') + ' A$' + avg.toFixed(2);
+  document.getElementById('qp-result-label').textContent = (LANG==='fi'?'Upside tasolta':'Upside from') + ' A$' + sp.toFixed(2);
+  
+  // Flash result border
+  const res = document.getElementById('qp-result');
+  res.style.borderColor = upside >= 0 ? 'var(--green)' : 'var(--red)';
+  setTimeout(() => res.style.borderColor = 'var(--border)', 600);
+}
+
+function quickScenario(apt, prod) {
+  document.getElementById('qp-apt').value = apt;
+  document.getElementById('qp-prod').value = prod;
+  quickPlay();
+  // Also load into main model
+  V.aptPrice = apt;
+  const half = Math.round(prod / 2);
+  V.mtCarbine = Math.min(half, 2000);
+  V.barruecopardo = prod - V.mtCarbine;
+  activeScenario = 'custom';
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sc-desc').innerHTML = t('scCustom');
+  rebuildAll();
+  render();
+}
+
+function toggleHero() {
+  heroCollapsed = !heroCollapsed;
+  const layout = document.getElementById('main-layout');
+  const hero = document.getElementById('hero-section');
+  const toggleText = document.getElementById('hero-toggle-text');
+  if(heroCollapsed) {
+    hero.querySelectorAll('.quick-play,.try-prompts,.hero-sub').forEach(el => el.style.display = 'none');
+    hero.querySelector('.hero-tagline').style.fontSize = '16px';
+    hero.style.padding = '12px 28px 0';
+    toggleText.textContent = '▶ ' + (LANG==='fi' ? 'Näytä pikamalli' : 'Show quick model');
+  } else {
+    hero.querySelectorAll('.quick-play,.try-prompts,.hero-sub').forEach(el => el.style.display = '');
+    hero.querySelector('.hero-tagline').style.fontSize = '';
+    hero.style.padding = '';
+    toggleText.textContent = '▼ ' + (LANG==='fi' ? 'Täysi malli' : 'Full model');
+  }
+}
+
+function updateHeroLang() {
+  const titles = {
+    fi: ['Entä jos tungsten nousee $3 500:een?', 'EQR operoi kahta volframikaivosta massiivisella operating leveragella. Vedä slidereita ja näe miten <b>APT-hinta</b> ja <b>tuotanto</b> vaikuttavat osakkeenomistajan arvoon — reaaliajassa.'],
+    en: ['What if tungsten hits $3,500?', 'EQR operates two tungsten mines with massive operating leverage. Drag the sliders to see how <b>APT price</b> and <b>production</b> affect shareholder value — in real time.']
+  };
+  document.getElementById('hero-title').textContent = titles[LANG][0];
+  document.getElementById('hero-sub').innerHTML = titles[LANG][1];
+  document.getElementById('hero-toggle-text').textContent = heroCollapsed 
+    ? ('▶ ' + (LANG==='fi' ? 'Näytä pikamalli' : 'Show quick model'))
+    : ('▼ ' + (LANG==='fi' ? 'Täysi malli' : 'Full model'));
+  // Update try buttons
+  const btns = document.querySelectorAll('.try-btn');
+  if(LANG === 'fi') {
+    btns[0].textContent = '🐻 Bear: APT romahtaa $1 200:een';
+    btns[1].textContent = '🚀 Bull: APT $3 500 + ramp-up';
+    btns[2].textContent = '🔭 Supersykli: APT $5 000';
+  } else {
+    btns[0].textContent = '🐻 Bear: APT crash to $1,200';
+    btns[1].textContent = '🚀 Bull: APT $3,500 + ramp-up';
+    btns[2].textContent = '🔭 Supercycle: APT $5,000';
+  }
+  quickPlay();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // RESET & INIT
 // ═══════════════════════════════════════════════════════════════════════════
-function resetAll(){loadScenario('base');SP=0.345;document.getElementById('sp-input').value='0.345';render();}
-rebuildAll(); render();
+function resetAll(){loadScenario('base');SP=0.345;document.getElementById('sp-input').value='0.345';document.getElementById('qp-apt').value=2160;document.getElementById('qp-prod').value=3000;quickPlay();render();}
+rebuildAll(); render(); quickPlay();
 // Load config and live data on startup
 loadConfig().then(async () => {
   await fetchLivePrice();
+  quickPlay(); // re-run with live SP
   const apt = await fetchAPTPrice();
   if(apt) {
     const status = document.getElementById('live-status');
