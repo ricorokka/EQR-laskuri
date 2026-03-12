@@ -1,0 +1,130 @@
+name: Update APT Price
+
+on:
+  schedule:
+    # Run daily at 08:00 UTC (Mon-Fri) — after European metals markets open
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-apt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch APT price and update config.json
+        run: |
+          set -e
+          
+          echo "Fetching tungsten APT price..."
+          
+          # Try multiple sources for APT price
+          APT_PRICE=""
+          SOURCE=""
+          
+          # Source 1: Mining.com tungsten page
+          if [ -z "$APT_PRICE" ]; then
+            RESPONSE=$(curl -sL --max-time 15 "https://www.mining.com/markets/commodities/tungsten/" 2>/dev/null || true)
+            if [ -n "$RESPONSE" ]; then
+              # Extract price — look for APT price pattern
+              PRICE=$(echo "$RESPONSE" | grep -oP 'APT[^$]*\$\s*[\d,]+' | head -1 | grep -oP '[\d,]+' | head -1 | tr -d ',')
+              if [ -n "$PRICE" ] && [ "$PRICE" -gt 100 ] && [ "$PRICE" -lt 10000 ]; then
+                APT_PRICE="$PRICE"
+                SOURCE="mining.com"
+              fi
+            fi
+          fi
+          
+          # Source 2: Try Fastmarkets via search
+          if [ -z "$APT_PRICE" ]; then
+            RESPONSE=$(curl -sL --max-time 15 "https://www.fastmarkets.com/metals-and-mining/tungsten/" 2>/dev/null || true)
+            if [ -n "$RESPONSE" ]; then
+              PRICE=$(echo "$RESPONSE" | grep -oP '[\d,]+(?:\.\d+)?\s*(?:USD)?/mtu' | head -1 | grep -oP '[\d,]+' | head -1 | tr -d ',')
+              if [ -n "$PRICE" ] && [ "$PRICE" -gt 100 ] && [ "$PRICE" -lt 10000 ]; then
+                APT_PRICE="$PRICE"
+                SOURCE="fastmarkets"
+              fi
+            fi
+          fi
+          
+          if [ -z "$APT_PRICE" ]; then
+            echo "Could not fetch APT price from any source. Skipping update."
+            exit 0
+          fi
+          
+          echo "APT price: \$${APT_PRICE}/mtu (source: ${SOURCE})"
+          
+          # Also fetch EQR.AX share price from Yahoo Finance
+          SHARE_PRICE=""
+          YAHOO_RESPONSE=$(curl -sL --max-time 10 "https://query1.finance.yahoo.com/v8/finance/chart/EQR.AX?interval=1d&range=1d" 2>/dev/null || true)
+          if [ -n "$YAHOO_RESPONSE" ]; then
+            SHARE_PRICE=$(echo "$YAHOO_RESPONSE" | python3 -c "
+          import sys, json
+          try:
+              data = json.load(sys.stdin)
+              meta = data['chart']['result'][0]['meta']
+              price = meta.get('regularMarketPrice') or meta.get('previousClose')
+              if price and price > 0:
+                  print(f'{price:.3f}')
+          except: pass
+          " 2>/dev/null || true)
+          fi
+          
+          # Fetch AUD/USD
+          AUD_USD=""
+          FX_RESPONSE=$(curl -sL --max-time 10 "https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1d&range=1d" 2>/dev/null || true)
+          if [ -n "$FX_RESPONSE" ]; then
+            AUD_USD=$(echo "$FX_RESPONSE" | python3 -c "
+          import sys, json
+          try:
+              data = json.load(sys.stdin)
+              meta = data['chart']['result'][0]['meta']
+              rate = meta.get('regularMarketPrice') or meta.get('previousClose')
+              if rate and rate > 0:
+                  print(f'{rate:.3f}')
+          except: pass
+          " 2>/dev/null || true)
+          fi
+          
+          # Update config.json using Python for reliable JSON manipulation
+          python3 << 'PYEOF'
+          import json
+          from datetime import datetime
+          
+          with open('config.json', 'r') as f:
+              config = json.load(f)
+          
+          apt = "${{ env.APT_PRICE }}" or "${APT_PRICE}"
+          share = "${SHARE_PRICE}"
+          aud = "${AUD_USD}"
+          
+          if apt:
+              config['market']['aptPrice'] = int(apt)
+          if share:
+              config['market']['sharePrice'] = float(share)
+          if aud:
+              config['market']['audUsd'] = float(aud)
+          
+          config['lastUpdated'] = datetime.utcnow().strftime('%Y-%m-%d')
+          config['lastUpdatedBy'] = 'GitHub Actions'
+          
+          with open('config.json', 'w') as f:
+              json.dump(config, f, indent=2, ensure_ascii=False)
+          
+          print(f"Updated: APT=${apt}, Share={share}, AUD/USD={aud}")
+          PYEOF
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-update market data $(date -u +%Y-%m-%d)"
+            git push
+          fi
