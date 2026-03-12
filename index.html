@@ -57,9 +57,14 @@
   .kpi-val { font-family:var(--mono); font-weight:700; color:var(--kpi-color,var(--gold)); line-height:1; }
   .kpi-val.big { font-size:20px; } .kpi-val.med { font-size:16px; }
   .kpi-sub { font-size:9px; color:var(--text-muted); margin-top:4px; }
-  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; }
-  .card:hover { border-color:#2a3a4e; }
-  .card-title { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-family:var(--mono); }
+  .card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:18px; transition:border-color .2s, box-shadow .2s; }
+  .card:hover { border-color:#2a3a4e; box-shadow:0 2px 12px rgba(0,0,0,0.2); }
+  .card-title { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:14px; font-family:var(--mono); cursor:pointer; user-select:none; display:flex; align-items:center; gap:6px; transition:color .2s; }
+  .card-title:hover { color:var(--text-dim); }
+  .card-title::after { content:''; display:inline-block; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-top:5px solid currentColor; transition:transform .2s; margin-left:auto; }
+  .card.collapsed .card-title::after { transform:rotate(-90deg); }
+  .card.collapsed .card-body { display:none; }
+  .card-body { animation:fadeIn .2s ease; }
   .irow { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
   .irow.bold { border-top:1px solid var(--border); margin-top:2px; padding-top:6px; }
   .irow.ind .il { padding-left:14px; }
@@ -105,11 +110,31 @@
   .ptbl tr.hl td { background:rgba(200,169,110,0.08); color:var(--gold); }
   @media(max-width:900px){
     .layout{grid-template-columns:1fr;}
-    .left-panel{position:static;height:auto;}
+    .left-panel{position:static;height:auto;max-height:50vh;border-right:none;border-bottom:1px solid var(--border);}
     .g4{grid-template-columns:repeat(2,1fr);}
+    .g3{grid-template-columns:1fr;}
     .sc-grid{grid-template-columns:repeat(2,1fr);}
-    .tabs{overflow-x:auto;}
+    .tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    header{padding:10px 14px;flex-wrap:wrap;gap:8px;}
   }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+  .kpi { transition:border-color .2s, transform .15s, box-shadow .2s; }
+  .kpi:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+  .tab { transition:all .15s ease; white-space:nowrap; }
+  .tab.active { box-shadow:0 -2px 8px rgba(200,169,110,0.15); }
+  .tab-content.active { animation:fadeIn .25s ease; }
+  /* Smooth scrollbar */
+  .left-panel::-webkit-scrollbar { width:4px; }
+  .left-panel::-webkit-scrollbar-track { background:var(--bg2); }
+  .left-panel::-webkit-scrollbar-thumb { background:#374151; border-radius:2px; }
+  .left-panel::-webkit-scrollbar-thumb:hover { background:#4b5563; }
+  /* Slider hover feedback */
+  .slider-row:hover .track-thumb { transform:translate(-50%,-50%) scale(1.2); }
+  .slider-row .track-thumb { transition:transform .15s, box-shadow .15s; }
+  /* Loading pulse */
+  .loading-pulse { animation:pulse 1.5s infinite; }
 </style>
 </head>
 <body>
@@ -154,19 +179,19 @@
     <!-- STOCK PRICE PANEL -->
     <div style="display:flex;align-items:stretch;gap:0;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex-wrap:wrap;">
       <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:170px;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">ASX: EQR — Kurssi (A$)</div>
+        <div id="sp-price-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">ASX: EQR — Kurssi (A$)</div>
         <div style="display:flex;align-items:baseline;gap:4px;">
           <span style="font-family:var(--mono);font-size:13px;color:var(--text-muted);">A$</span>
           <input id="sp-input" type="number" value="0.345" step="0.005" min="0.001" oninput="onSP()" style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);background:transparent;border:none;border-bottom:1px solid #374151;width:90px;outline:none;padding:2px 0;">
         </div>
-        <div style="font-size:9px;color:#4b5563;margin-top:3px;">Syötä osakekurssi</div>
+        <div id="sp-hint" style="font-size:9px;color:#4b5563;margin-top:3px;">Syötä osakekurssi</div>
       </div>
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Markkina-arvo</div><div id="sp-mktcap" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);"></div><div id="sp-mktcap-usd" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EV/EBITDA upside</div><div id="sp-ev" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-ev-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">DCF upside</div><div id="sp-dcf" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-dcf-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
-      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Avg. tavoite</div><div id="sp-avg" style="font-family:var(--mono);font-size:22px;font-weight:700;"></div><div id="sp-avg-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div id="sp-mktcap-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Markkina-arvo</div><div id="sp-mktcap" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);"></div><div id="sp-mktcap-usd" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div id="sp-ev-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EV/EBITDA upside</div><div id="sp-ev" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-ev-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div id="sp-dcf-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">DCF upside</div><div id="sp-dcf" style="font-family:var(--mono);font-size:20px;font-weight:700;"></div><div id="sp-dcf-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border);min-width:130px;"><div id="sp-avg-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Avg. tavoite</div><div id="sp-avg" style="font-family:var(--mono);font-size:22px;font-weight:700;"></div><div id="sp-avg-tgt" style="font-size:9px;color:#4b5563;margin-top:3px;"></div></div>
       <div style="padding:14px 18px;flex:2;min-width:180px;display:flex;flex-direction:column;justify-content:center;">
-        <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">52vk <span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span></div>
+        <div id="sp-52wk-label" style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">52vk <span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span></div>
         <div style="position:relative;height:6px;background:var(--bg4);border-radius:3px;"><div id="sp-bar-fill" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#374151,var(--gold));border-radius:3px;"></div><div id="sp-bar-dot" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);box-shadow:0 0 6px var(--gold);"></div></div>
         <div style="display:flex;justify-content:space-between;font-size:9px;color:#4b5563;margin-top:3px;"><span>A$0.028</span><span>A$0.390</span></div>
       </div>
@@ -189,47 +214,47 @@
 
     <!-- TAB: CORE -->
     <div class="tab-content active" id="tc-core">
-      <div class="card"><div class="card-title">▸ Tuloslaskelma (M USD)</div><div id="income"></div></div>
-      <div class="card"><div class="card-title">▸ Marginaalit & Spredit</div><div id="margins"></div></div>
-      <div class="card"><div class="card-title">▸ Herkkyysanalyysi — EPS (USD)</div><div style="overflow-x:auto;" id="senswrap"></div><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="sens-note"></div></div>
-      <div class="card"><div class="card-title">▸ Arvostussilta (A$/osake)</div><div id="bridge"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Tuloslaskelma (M USD)</div><div class="card-body" id="income"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Marginaalit & Spredit</div><div class="card-body" id="margins"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Herkkyysanalyysi — EPS (USD)</div><div class="card-body"><div style="overflow-x:auto;" id="senswrap"></div><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="sens-note"></div></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Arvostussilta (A$/osake)</div><div class="card-body" id="bridge"></div></div>
     </div>
 
     <!-- TAB: DCF -->
     <div class="tab-content" id="tc-dcf">
-      <div class="card"><div class="card-title">▸ DCF — Diskontattu kassavirta-analyysi</div><div id="dcf-detail"></div></div>
-      <div class="card"><div class="card-title">▸ DCF-herkkyys — WACC vs. Terminaalikasvu</div><div style="overflow-x:auto;" id="dcf-sens"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ DCF — Diskontattu kassavirta-analyysi</div><div class="card-body" id="dcf-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ DCF-herkkyys — WACC vs. Terminaalikasvu</div><div class="card-body"><div style="overflow-x:auto;" id="dcf-sens"></div></div></div>
     </div>
 
     <!-- TAB: BREAKEVEN -->
     <div class="tab-content" id="tc-breakeven">
-      <div class="card"><div class="card-title">▸ Kaivoskohtainen breakeven-analyysi</div><div id="breakeven-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Kaivoskohtainen breakeven-analyysi</div><div class="card-body" id="breakeven-detail"></div></div>
     </div>
 
     <!-- TAB: PEERS -->
     <div class="tab-content" id="tc-peers">
-      <div class="card"><div class="card-title">▸ Vertailuarvostus — Tungsten-yhtiöt</div><div id="peer-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Vertailuarvostus — Tungsten-yhtiöt</div><div class="card-body" id="peer-detail"></div></div>
     </div>
 
     <!-- TAB: NAV -->
     <div class="tab-content" id="tc-nav">
-      <div class="card"><div class="card-title">▸ Osakekohtainen NAV-erittely (Sum-of-the-Parts)</div><div id="nav-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Osakekohtainen NAV-erittely (Sum-of-the-Parts)</div><div class="card-body" id="nav-detail"></div></div>
     </div>
 
     <!-- TAB: TIMELINE -->
     <div class="tab-content" id="tc-timeline">
-      <div class="card"><div class="card-title">▸ 5-vuotisennuste 2026–2030 (M USD)</div><div style="overflow-x:auto;" id="timeline-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ 5-vuotisennuste 2026–2030 (M USD)</div><div class="card-body"><div style="overflow-x:auto;" id="timeline-detail"></div></div></div>
     </div>
 
     <!-- TAB: MONTE CARLO -->
     <div class="tab-content" id="tc-mc">
-      <div class="card"><div class="card-title">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="mc-note"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Monte Carlo -simulaatio (5 000 ajoa)</div><div class="card-body"><div id="mc-stats"></div><canvas id="mc-canvas" class="mc-canvas"></canvas><div style="font-size:9px;color:#4b5563;margin-top:8px;" id="mc-note"></div></div></div>
     </div>
 
     <!-- TAB: ACTUALS -->
     <div class="tab-content" id="tc-actuals">
-      <div class="card"><div class="card-title">▸ Toteumat vs. mallin ennuste</div><div id="actuals-detail"></div></div>
-      <div class="card"><div class="card-title">▸ Config-tiedoston tiedot</div><div id="config-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Toteumat vs. mallin ennuste</div><div class="card-body" id="actuals-detail"></div></div>
+      <div class="card"><div class="card-title" onclick="toggleCard(this)">▸ Config-tiedoston tiedot</div><div class="card-body" id="config-detail"></div></div>
     </div>
 
     <div class="disclaimer" id="disclaimer-text"></div>
@@ -484,9 +509,21 @@ function setLang(lang) {
     const descKeys = {bear:'scDescBear',base:'scDescBase',bull:'scDescBull',mega:'scDescMega'};
     document.getElementById('sc-desc').innerHTML = t(descKeys[activeScenario] || 'scDescBase');
   }
-  // Update stock panel labels
-  document.querySelector('#sp-input').parentElement.parentElement.querySelector('div:first-child').textContent = t('spPrice');
-  document.querySelector('#sp-input').parentElement.nextElementSibling.textContent = t('spEnter');
+  // Update stock panel labels via ids
+  const spLabel = document.getElementById('sp-price-label');
+  if(spLabel) spLabel.textContent = t('spPrice');
+  const spHint = document.getElementById('sp-hint');
+  if(spHint) spHint.textContent = t('spEnter');
+  const mktLabel = document.getElementById('sp-mktcap-label');
+  if(mktLabel) mktLabel.textContent = t('spMktCap');
+  const evLabel = document.getElementById('sp-ev-label');
+  if(evLabel) evLabel.textContent = t('spEVupside');
+  const dcfLabel = document.getElementById('sp-dcf-label');
+  if(dcfLabel) dcfLabel.textContent = t('spDCFupside');
+  const avgLabel = document.getElementById('sp-avg-label');
+  if(avgLabel) avgLabel.textContent = t('spAvgTarget');
+  const wkLabel = document.getElementById('sp-52wk-label');
+  if(wkLabel) wkLabel.innerHTML = t('sp52wk') + ' <span style="color:#4b5563;text-transform:none;letter-spacing:0;">A$0.028 – A$0.390</span>';
   render();
 }
 
@@ -531,8 +568,15 @@ const fi=(n,d=1)=>isNaN(n)||!isFinite(n)?'–':n.toLocaleString('fi-FI',{minimum
 const fM=(n,d=1)=>'$'+fi(n,d)+'M';
 const fU=(n,d=1)=>'$'+fi(n,d);
 const fA=(n,d=3)=>'A$'+fi(n,d);
-function fmtSV(v,u){if(u==='USD/mtu')return'$'+Math.round(v);if(u==='%')return v+'%';if(u==='x')return v+'x';if(u==='kurssi')return'A$'+v;if(u==='M USD')return'$'+v+'M';return fi(v,0)+' '+u;}
+function fmtSV(v,u){if(u==='USD/mtu')return'$'+Math.round(v);if(u==='%')return v+'%';if(u==='x')return v+'x';if(u==='kurssi'||u==='rate')return'A$'+v;if(u==='M USD')return'$'+v+'M';return fi(v,0)+' '+u;}
 
+// Card collapse toggle
+function toggleCard(titleEl) {
+  const card = titleEl.closest('.card');
+  card.classList.toggle('collapsed');
+}
+
+// Smooth tab switch with scroll
 function switchTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',t.textContent.toLowerCase().includes(id)||
     (id==='core'&&i===0)||(id==='dcf'&&i===1)||(id==='breakeven'&&i===2)||(id==='peers'&&i===3)||(id==='nav'&&i===4)||(id==='timeline'&&i===5)||(id==='mc'&&i===6)||(id==='actuals'&&i===7)));
@@ -956,37 +1000,60 @@ function render(){
 // ═══════════════════════════════════════════════════════════════════════════
 let LIVE_DATA = { sharePrice:null, audUsd:null, configLoaded:false, config:null, errors:[] };
 
-// Yahoo Finance via CORS proxy (allorigins)
+// Yahoo Finance via multiple CORS proxies with fallback chain
+async function tryFetch(url, proxies) {
+  for(const proxy of proxies) {
+    try {
+      const fullUrl = proxy ? proxy + encodeURIComponent(url) : url;
+      const resp = await fetch(fullUrl, {signal: AbortSignal.timeout(6000)});
+      if(resp.ok) return await resp.json();
+    } catch(e) { /* try next */ }
+  }
+  return null;
+}
+
 async function fetchLivePrice() {
   const status = document.getElementById('live-status');
   status.innerHTML = t('liveLoading');
+  
+  const proxies = [
+    'https://api.allorigins.win/raw?url=',
+    'https://corsproxy.io/?',
+    'https://api.codetabs.com/v1/proxy?quest=',
+  ];
+  
+  // EQR.AX share price — try v8 chart API
   try {
-    // EQR.AX share price
-    const eqrUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/EQR.AX?interval=1d&range=1d';
-    const eqrProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(eqrUrl);
-    const eqrResp = await fetch(eqrProxy); 
-    if(eqrResp.ok) {
-      const eqrData = await eqrResp.json();
+    const eqrUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/EQR.AX?interval=1d&range=5d';
+    const eqrData = await tryFetch(eqrUrl, proxies);
+    if(eqrData) {
       const meta = eqrData?.chart?.result?.[0]?.meta;
-      const price = meta?.regularMarketPrice || meta?.previousClose || 
-        (eqrData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null)?.pop());
-      if(price && price > 0) { LIVE_DATA.sharePrice = price; }
+      const closes = eqrData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null);
+      const price = meta?.regularMarketPrice || meta?.previousClose || (closes && closes.length > 0 ? closes[closes.length-1] : null);
+      if(price && price > 0) LIVE_DATA.sharePrice = price;
     }
   } catch(e) { LIVE_DATA.errors.push('EQR: '+e.message); }
 
+  // AUD/USD
   try {
-    // AUD/USD
-    const fxUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1d&range=1d';
-    const fxProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(fxUrl);
-    const fxResp = await fetch(fxProxy);
-    if(fxResp.ok) {
-      const fxData = await fxResp.json();
+    const fxUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1d&range=5d';
+    const fxData = await tryFetch(fxUrl, proxies);
+    if(fxData) {
       const fxMeta = fxData?.chart?.result?.[0]?.meta;
-      const rate = fxMeta?.regularMarketPrice || fxMeta?.previousClose ||
-        (fxData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null)?.pop());
-      if(rate && rate > 0) { LIVE_DATA.audUsd = rate; }
+      const fxCloses = fxData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v=>v!=null);
+      const rate = fxMeta?.regularMarketPrice || fxMeta?.previousClose || (fxCloses && fxCloses.length > 0 ? fxCloses[fxCloses.length-1] : null);
+      if(rate && rate > 0) LIVE_DATA.audUsd = rate;
     }
   } catch(e) { LIVE_DATA.errors.push('FX: '+e.message); }
+
+  // If Yahoo failed for price, try config fallback
+  if(!LIVE_DATA.sharePrice && LIVE_DATA.config?.market?.sharePrice) {
+    LIVE_DATA.sharePrice = LIVE_DATA.config.market.sharePrice;
+    LIVE_DATA.priceSource = 'config';
+  }
+  if(!LIVE_DATA.audUsd && LIVE_DATA.config?.market?.audUsd) {
+    LIVE_DATA.audUsd = LIVE_DATA.config.market.audUsd;
+  }
 
   // Apply live data
   if(LIVE_DATA.sharePrice) {
@@ -999,11 +1066,11 @@ async function fetchLivePrice() {
 
   // Update status
   const parts = [];
-  if(LIVE_DATA.sharePrice) parts.push('EQR A$' + LIVE_DATA.sharePrice.toFixed(3));
+  if(LIVE_DATA.sharePrice) parts.push('EQR A$' + LIVE_DATA.sharePrice.toFixed(3) + (LIVE_DATA.priceSource==='config' ? ' (config)' : ''));
   if(LIVE_DATA.audUsd) parts.push('AUD/USD ' + LIVE_DATA.audUsd.toFixed(3));
   if(parts.length > 0) {
     status.innerHTML = '🟢 Live: ' + parts.join(' | ');
-    status.style.color = 'var(--green)';
+    status.style.color = LIVE_DATA.priceSource==='config' ? 'var(--orange)' : 'var(--green)';
   } else {
     status.innerHTML = t('liveFail');
     status.style.color = 'var(--red)';
@@ -1011,6 +1078,45 @@ async function fetchLivePrice() {
 
   if(LIVE_DATA.audUsd && activeScenario === 'base') rebuildAll();
   render();
+}
+
+// APT price fetch — try metals data sources, update config suggestion
+async function fetchAPTPrice() {
+  const proxies = [
+    'https://api.allorigins.win/raw?url=',
+    'https://corsproxy.io/?',
+  ];
+  
+  // Try to get tungsten APT from a public metals data page
+  try {
+    // Mining.com tungsten price page (as a proxy for current APT)
+    const url = 'https://www.mining.com/markets/commodities/tungsten/';
+    for(const proxy of proxies) {
+      try {
+        const resp = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(8000)});
+        if(resp.ok) {
+          const text = await resp.text();
+          // Try to extract APT price from page content
+          const match = text.match(/APT[\s\S]{0,100}?\$\s*([\d,]+)/i) || text.match(/([\d,]+)\s*(?:USD)?\/mtu/i);
+          if(match) {
+            const aptVal = parseFloat(match[1].replace(/,/g,''));
+            if(aptVal > 100 && aptVal < 10000) {
+              LIVE_DATA.aptPrice = aptVal;
+              LIVE_DATA.aptSource = 'web';
+              return aptVal;
+            }
+          }
+        }
+      } catch(e) { /* try next proxy */ }
+    }
+  } catch(e) { /* silent */ }
+  
+  // Fallback: use config.json APT price
+  if(LIVE_DATA.config?.market?.aptPrice) {
+    LIVE_DATA.aptPrice = LIVE_DATA.config.market.aptPrice;
+    LIVE_DATA.aptSource = 'config';
+  }
+  return LIVE_DATA.aptPrice || null;
 }
 
 // Load config.json from GitHub repo
@@ -1134,7 +1240,14 @@ function renderActuals() {
 function resetAll(){loadScenario('base');SP=0.345;document.getElementById('sp-input').value='0.345';render();}
 rebuildAll(); render();
 // Load config and live data on startup
-loadConfig().then(() => fetchLivePrice());
+loadConfig().then(async () => {
+  await fetchLivePrice();
+  const apt = await fetchAPTPrice();
+  if(apt) {
+    const status = document.getElementById('live-status');
+    status.innerHTML += ' | APT $' + fi(apt,0) + '/mtu' + (LIVE_DATA.aptSource==='config' ? ' (config)' : '');
+  }
+});
 </script>
 </body>
 </html>
